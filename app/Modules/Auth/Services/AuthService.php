@@ -4,6 +4,7 @@
 namespace App\Modules\Auth\Services;
 
 
+use App\GenericModels\User;
 use App\Generics\Services\AbstractService;
 use App\Modules\User\Repositories\UserRepositoryContract;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Hash;
  */
 class AuthService extends AbstractService implements AuthServiceContract
 {
+    /**
+     * @var User
+     */
+    protected User $loggedUser;
     /**
      * @var UserRepositoryContract
      */
@@ -41,7 +46,29 @@ class AuthService extends AbstractService implements AuthServiceContract
      */
     public function login(array $credentials): ?array
     {
+        $credentials = [
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+        ];
 
+        $token = $this->jwtService
+            ->createTokenByCredentials($credentials);
+
+        if(!$token || $this->jwtService->hasErrors()) {
+
+            $this->addError(
+                400,
+                'AuthService@registration',
+                'JWT token creation failed!'
+            );
+            return null;
+        }
+
+        return [
+            'data' => [
+                'token' => $token,
+            ]
+        ];
     }
 
     /**
@@ -72,7 +99,7 @@ class AuthService extends AbstractService implements AuthServiceContract
         $token = $this->jwtService
             ->createTokenByCredentials($payload);
 
-        if($this->jwtService->hasErrors()) {
+        if(!$token || $this->jwtService->hasErrors()) {
 
             $this->addError(
                 400,
@@ -87,5 +114,49 @@ class AuthService extends AbstractService implements AuthServiceContract
                 'token' => $token,
             ]
         ];
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getLoggedUser(): ?User
+    {
+        $user = null;
+
+        if(isset($this->loggedUser))
+            return $this->loggedUser;
+
+        $user = $this->jwtService
+            ->getLoggedUserByToken();
+
+        if($user) {
+
+            $this->loggedUser = $user;
+
+            return $user;
+        }
+
+        return null;
+    }
+
+    /**
+     * Set new User instance for php LifeCycle.
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function setLoggedUser(int $userID): bool
+    {
+        $user = $this->userRepository
+            ->get($userID);
+
+        if ($user) {
+
+            $this->loggedUser = $user;
+
+            return true;
+        }
+
+        return false;
     }
 }

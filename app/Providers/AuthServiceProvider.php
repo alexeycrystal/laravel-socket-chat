@@ -25,6 +25,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        $this->app->singleton(
+            \App\Modules\Auth\Services\AuthServiceContract::class,
+            \App\Modules\Auth\Services\AuthService::class
+        );
     }
 }

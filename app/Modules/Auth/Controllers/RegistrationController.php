@@ -30,6 +30,6 @@ class RegistrationController extends Controller
         if(!$result || $this->authService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs during the user registration process!'
-            ], 401);
+            ], 400);
     }
 }

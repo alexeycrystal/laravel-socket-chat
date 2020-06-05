@@ -14,6 +14,21 @@ use App\Generics\Repositories\AbstractRepository;
 class UserRepository extends AbstractRepository implements UserRepositoryContract
 {
     /**
+     * @param int $id
+     * @return User|null
+     */
+    public function get(int $id): ?User
+    {
+        $user = User::where('id', '=', $id)
+            ->first();
+
+        if($user)
+            return $user;
+
+        return null;
+    }
+
+    /**
      * @param array $payload
      * @return User|null
      */

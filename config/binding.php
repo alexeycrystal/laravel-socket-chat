@@ -17,6 +17,5 @@ return [
      * Auth
      */
     \App\Modules\Auth\Services\JWTServiceContract::class => \App\Modules\Auth\Services\JWTService::class,
-    \App\Modules\Auth\Services\AuthServiceContract::class => \App\Modules\Auth\Services\AuthService::class,
 
 ];

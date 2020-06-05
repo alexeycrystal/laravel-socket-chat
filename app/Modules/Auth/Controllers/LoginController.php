@@ -19,10 +19,17 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request)
     {
-        return response()->json(['data' => 'tototototo']);
-
         $credentials = $request->validated();
 
-        $result = $this->authService->login($credentials);
+        $result = $this->authService
+            ->login($credentials);
+
+        if($result)
+            return response()->json($result, 200);
+
+        if(!$result || $this->authService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the user login process!'
+            ], 400);
     }
 }

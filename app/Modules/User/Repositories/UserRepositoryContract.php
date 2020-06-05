@@ -13,6 +13,12 @@ use App\GenericModels\User;
 interface UserRepositoryContract
 {
     /**
+     * @param int $id
+     * @return User|null
+     */
+    public function get(int $id): ?User;
+
+    /**
      * @param array $payload
      * @return User|null
      */

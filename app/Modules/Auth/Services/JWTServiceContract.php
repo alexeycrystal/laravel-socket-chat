@@ -4,6 +4,7 @@
 namespace App\Modules\Auth\Services;
 
 
+use App\GenericModels\User;
 use App\Generics\Services\AbstractServiceContract;
 
 /**
@@ -19,4 +20,9 @@ interface JWTServiceContract extends AbstractServiceContract
      * @return string|null
      */
     public function createTokenByCredentials(array $credentials): ?string;
+
+    /**
+     * @return User|null
+     */
+    public function getLoggedUserByToken(): ?User;
 }
