@@ -71,4 +71,15 @@ class JWTService extends AbstractService implements JWTServiceContract
 
         return null;
     }
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    public function createTokenByUser(User $user): string
+    {
+        $userToken = JWTAuth::fromUser($user);
+
+        return $userToken;
+    }
 }

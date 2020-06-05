@@ -22,6 +22,36 @@ class CreateUsersModuleTables extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        Schema::create('user_settings', function (Blueprint $table) {
+            $table->bigIncrements('id');
+
+            $table->unsignedBigInteger('user_id');
+
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+
+            $table->string('nickname')->nullable();
+            $table->string('timezone')->default('Europe/Kiev');
+            $table->string('phone')->nullable();
+
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
+
+            $table->string('city')->nullable();
+            $table->string('region')->nullable();
+            $table->string('country')->nullable();
+
+            $table->string('lang')->default('en');
+
+            $table->string('avatar_path', 1500)->nullable();
+
+            $table->timestamps();
+
+            $table->index(['user_id']);
+        });
     }
 
     /**
@@ -31,6 +61,7 @@ class CreateUsersModuleTables extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('user_settings');
         Schema::dropIfExists('users');
     }
 }

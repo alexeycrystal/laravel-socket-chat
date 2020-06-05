@@ -25,4 +25,10 @@ interface JWTServiceContract extends AbstractServiceContract
      * @return User|null
      */
     public function getLoggedUserByToken(): ?User;
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    public function createTokenByUser(User $user): string;
 }

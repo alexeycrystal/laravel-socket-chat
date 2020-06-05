@@ -4,9 +4,12 @@
 namespace App\Modules\Auth\Services;
 
 
+use App\Facades\RepositoryManager;
 use App\GenericModels\User;
 use App\Generics\Services\AbstractService;
 use App\Modules\User\Repositories\UserRepositoryContract;
+use App\Modules\User\Repositories\UserSettingsRepositoryContract;
+use App\Services\IP\LocationIPServiceContract;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -27,17 +30,31 @@ class AuthService extends AbstractService implements AuthServiceContract
      * @var JWTServiceContract
      */
     protected JWTServiceContract $jwtService;
+    /**
+     * @var UserSettingsRepositoryContract
+     */
+    protected UserSettingsRepositoryContract $userSettingsRepository;
+    /**
+     * @var LocationIPServiceContract
+     */
+    protected LocationIPServiceContract $locationIPService;
 
     /**
      * AuthService constructor.
      * @param UserRepositoryContract $userRepository
      * @param JWTServiceContract $jwtService
+     * @param UserSettingsRepositoryContract $userSettingsRepository
+     * @param LocationIPServiceContract $locationIPService
      */
     public function __construct(UserRepositoryContract $userRepository,
-                                JWTServiceContract $jwtService)
+                                JWTServiceContract $jwtService,
+                                UserSettingsRepositoryContract $userSettingsRepository,
+                                LocationIPServiceContract $locationIPService)
     {
         $this->userRepository = $userRepository;
         $this->jwtService = $jwtService;
+        $this->userSettingsRepository = $userSettingsRepository;
+        $this->locationIPService = $locationIPService;
     }
 
     /**
@@ -57,9 +74,9 @@ class AuthService extends AbstractService implements AuthServiceContract
         if(!$token || $this->jwtService->hasErrors()) {
 
             $this->addError(
-                400,
+                422,
                 'AuthService@registration',
-                'JWT token creation failed!'
+                'Your password is invalid or user with such password is not existed!'
             );
             return null;
         }
@@ -83,8 +100,33 @@ class AuthService extends AbstractService implements AuthServiceContract
             'name' => $payload['name'],
         ];
 
-        $user = $this->userRepository
-            ->create($fields);
+        $user = RepositoryManager::resolveTransactional(function() use ($fields, $payload) {
+
+            $user = $this->userRepository
+                ->create($fields);
+
+            $settings = null;
+
+            if($user) {
+
+                $settingsPayload = [
+                    'user_id' => $user->id,
+                    'lang' => $payload['lang'],
+                ];
+
+                $settingsData = $this->prepareUserSettingsPayload($settingsPayload);
+
+                $settings = $this->userSettingsRepository
+                    ->create($settingsData);
+            }
+
+            if(!$user || !$settings)
+                return null;
+
+            return $user;
+
+        }, true);
+
 
         if(!$user) {
 
@@ -97,7 +139,7 @@ class AuthService extends AbstractService implements AuthServiceContract
         }
 
         $token = $this->jwtService
-            ->createTokenByCredentials($payload);
+            ->createTokenByUser($user);
 
         if(!$token || $this->jwtService->hasErrors()) {
 
@@ -113,6 +155,30 @@ class AuthService extends AbstractService implements AuthServiceContract
             'data' => [
                 'token' => $token,
             ]
+        ];
+    }
+
+    /**
+     * @param array $payload
+     * @return array|null
+     */
+    protected function prepareUserSettingsPayload(array $payload): ?array
+    {
+        $requestIp = request()->ip();
+
+        $data = $this->locationIPService
+            ->getLocationDataByIp($requestIp);
+
+        return [
+            'user_id' => $payload['user_id'],
+            'lang' => strtolower($payload['lang']),
+
+            'country' => $data->countryName ?? 'Ukraine',
+            'region' => $data->regionName ?? 'Kyiv',
+            'city' => $data->cityName ?? 'Kyiv',
+            'latitude' => $data->latitude ?? '50.4403',
+            'longitude' => $data->latitude ?? '30.4487',
+            'timezone' => $data->timezone ?? 'Europe/Kiev',
         ];
     }
 

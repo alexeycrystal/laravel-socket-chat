@@ -5,6 +5,7 @@ namespace App\Modules\Auth\Requests;
 
 
 use App\Generics\Requests\JsonRequest;
+use App\Modules\Auth\Rules\LanguageValidationRule;
 
 class RegistrationRequest extends JsonRequest
 {
@@ -33,6 +34,11 @@ class RegistrationRequest extends JsonRequest
                 'string',
                 'max:200',
             ],
+            'lang' => [
+                'required',
+                'size:2',
+                new LanguageValidationRule(),
+            ]
         ];
     }
 }
