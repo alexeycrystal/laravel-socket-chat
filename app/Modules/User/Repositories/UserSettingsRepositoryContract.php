@@ -5,6 +5,7 @@ namespace App\Modules\User\Repositories;
 
 
 use App\Modules\User\Models\UserSettings;
+use stdClass;
 
 /**
  * Interface UserSettingsRepositoryContract
@@ -17,4 +18,10 @@ interface UserSettingsRepositoryContract
      * @return UserSettings|null
      */
     public function create(array $payload): ?UserSettings;
+
+    /**
+     * @param int $userId
+     * @return stdClass|null
+     */
+    public function get(int $userId): ?\stdClass;
 }

@@ -11,6 +11,8 @@ return [
     \App\Modules\User\Repositories\UserRepositoryContract::class => \App\Modules\User\Repositories\UserRepository::class,
     \App\Modules\User\Repositories\UserSettingsRepositoryContract::class => \App\Modules\User\Repositories\UserSettingsRepository::class,
 
+    \App\Modules\User\Services\UserProfileServiceContract::class => \App\Modules\User\Services\UserProfileService::class,
+
     /**
      * Services
      */

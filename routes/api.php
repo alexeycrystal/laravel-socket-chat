@@ -18,10 +18,23 @@ header('Access-Control-Allow-Credentials: true');
 | routes are loaded by the RouteServiceProvider within a group which
 */
 
-Route::group(['prefix' => 'auth', 'namespace' => 'App\Modules\Auth\Controllers'], function() {
+Route::group([
+    'prefix' => 'auth',
+    'namespace' => 'App\Modules\Auth\Controllers'
+], function() {
 
     Route::post('login', 'LoginController@login');
 
     Route::post('registration', 'RegistrationController@registration');
+
+});
+
+Route::group([
+    'prefix' => 'profile',
+    'middleware' => 'jwt.auth',
+    'namespace' => 'App\Modules\User\Controllers'
+], function() {
+
+    Route::get('settings/get', 'UserProfileController@getProfileByLoggedUser');
 
 });
