@@ -5,6 +5,7 @@ namespace App\Services\IP;
 
 
 use App\Generics\Services\AbstractService;
+use Illuminate\Support\Facades\Validator;
 use Stevebauman\Location\Facades\Location;
 use Stevebauman\Location\Position;
 
@@ -20,6 +21,13 @@ class LocationIPService extends AbstractService implements LocationIPServiceCont
      */
     public function getLocationDataByIp(string $ip): ?Position
     {
+        $validator = Validator::make(['ip' => $ip], [
+            'ip' => 'required|ip'
+        ]);
+
+        if($validator->fails())
+            return null;
+
         $data = Location::get($ip);
 
         if($data && is_object($data))
