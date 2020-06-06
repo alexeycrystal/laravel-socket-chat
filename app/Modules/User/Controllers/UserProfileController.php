@@ -37,7 +37,7 @@ class UserProfileController extends Controller
         $payload = $request->validated();
 
         $result = $this->userProfileService
-            ->changePassword($payload);
+            ->changePassword($payload['password']);
 
         if($result)
             return response()->json($result, 200);

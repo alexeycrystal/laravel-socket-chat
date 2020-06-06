@@ -4,11 +4,13 @@
 namespace App\Modules\User\Services;
 
 
+use App\Generics\Services\AbstractServiceContract;
+
 /**
  * Interface UserProfileServiceContract
  * @package App\Modules\User\Services
  */
-interface UserProfileServiceContract
+interface UserProfileServiceContract extends AbstractServiceContract
 {
     /**
      * @return array|null
@@ -16,8 +18,8 @@ interface UserProfileServiceContract
     public function getUserProfileInfoByLoggedUser(): ?array;
 
     /**
-     * @param array $payload
+     * @param string $password
      * @return array|null
      */
-    public function changePassword(array $payload): ?array;
+    public function changePassword(string $password): ?array;
 }

@@ -154,6 +154,7 @@ class AuthService extends AbstractService implements AuthServiceContract
         return [
             'data' => [
                 'token' => $token,
+                'user_id' => $user->id,
             ]
         ];
     }

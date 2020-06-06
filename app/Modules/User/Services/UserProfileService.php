@@ -69,20 +69,30 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
     }
 
     /**
-     * @param array $payload
+     * @param string $password
      * @return array|array[]|null
      */
-    public function changePassword(array $payload): ?array
+    public function changePassword(string $password): ?array
     {
         $user = $this->authService
             ->getLoggedUser();
 
         $data = [
-            'password' => Hash::make($payload['password'])
+            'password' => Hash::make($password)
         ];
 
         $result = $this->userRepository
             ->update($user->id, $data);
+
+        if(!isset($result)) {
+
+            $this->addError(
+                504,
+                'UserProfileService@changePassword',
+                'Some temporary error happened with the database server.'
+            );
+            return null;
+        }
 
         return [
             'data' => [
