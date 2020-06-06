@@ -45,7 +45,7 @@ class UserProfileServiceTest extends AbstractTest
 
         $this->assertNull($this->userProfileService->hasErrors());
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('data', $result);
+        $this->assertArrayHasKey('result', $result);
 
         $token = $this->jwtService
             ->createTokenByCredentials([
@@ -67,6 +67,10 @@ class UserProfileServiceTest extends AbstractTest
         $this->assertNull($this->userProfileService->hasErrors());
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
-        $this->assertArrayHasKey('data', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('nickname', $result);
+        $this->assertArrayHasKey('timezone', $result);
+        $this->assertArrayHasKey('phone', $result);
+        $this->assertArrayHasKey('lang', $result);
     }
 }

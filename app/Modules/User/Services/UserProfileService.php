@@ -95,9 +95,7 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
         }
 
         return [
-            'data' => [
-                'result' => $result
-            ]
+            'result' => $result
         ];
     }
 }

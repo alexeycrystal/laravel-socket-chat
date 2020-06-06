@@ -4,6 +4,7 @@
 namespace App\Modules\Auth\Controllers;
 
 
+use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Requests\RegistrationRequest;
 use App\Modules\Auth\Services\AuthServiceContract;
@@ -25,7 +26,9 @@ class RegistrationController extends Controller
             ->registration($payload);
 
         if($result)
-            return response()->json($result, 201);
+            return response()->json(
+                BaseDataResponseTransformer::transform($result), 201
+            );
 
         if(!$result || $this->authService->hasErrors())
             return response()->json([

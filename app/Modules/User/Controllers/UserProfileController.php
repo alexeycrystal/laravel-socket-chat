@@ -4,6 +4,7 @@
 namespace App\Modules\User\Controllers;
 
 
+use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
 use App\Modules\User\Requests\ChangePasswordRequest;
 use App\Modules\User\Requests\GetProfileByLoggedUserRequest;
@@ -24,7 +25,9 @@ class UserProfileController extends Controller
             ->getUserProfileInfoByLoggedUser();
 
         if($result)
-            return response()->json($result, 200);
+            return response()->json(
+                BaseDataResponseTransformer::transform($result), 200
+            );
 
         if(!$result || $this->userProfileService->hasErrors())
             return response()->json([
@@ -40,7 +43,9 @@ class UserProfileController extends Controller
             ->changePassword($payload['password']);
 
         if($result)
-            return response()->json($result, 200);
+            return response()->json(
+                BaseDataResponseTransformer::transform($result), 200
+            );
 
         if(!$result || $this->userProfileService->hasErrors())
             return response()->json([

@@ -75,16 +75,14 @@ class AuthService extends AbstractService implements AuthServiceContract
 
             $this->addError(
                 422,
-                'AuthService@registration',
+                'AuthService@login',
                 'Your password is invalid or user with such password is not existed!'
             );
             return null;
         }
 
         return [
-            'data' => [
-                'token' => $token,
-            ]
+            'token' => $token,
         ];
     }
 
@@ -152,10 +150,8 @@ class AuthService extends AbstractService implements AuthServiceContract
         }
 
         return [
-            'data' => [
-                'token' => $token,
-                'user_id' => $user->id,
-            ]
+            'token' => $token,
+            'user_id' => $user->id,
         ];
     }
 

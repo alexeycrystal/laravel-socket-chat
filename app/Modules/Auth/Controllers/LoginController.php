@@ -4,6 +4,7 @@
 namespace App\Modules\Auth\Controllers;
 
 
+use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Requests\LoginRequest;
 use App\Modules\Auth\Services\AuthServiceContract;
@@ -25,7 +26,9 @@ class LoginController extends Controller
             ->login($credentials);
 
         if($result)
-            return response()->json($result, 200);
+            return response()->json(
+                BaseDataResponseTransformer::transform($result), 200
+            );
 
         if(!$result || $this->authService->hasErrors())
             return response()->json([

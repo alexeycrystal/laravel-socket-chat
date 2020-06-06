@@ -6,6 +6,7 @@ namespace Tests\Unit;
 
 use App\Modules\Auth\Services\AuthServiceContract;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 abstract class AbstractTest extends TestCase
@@ -14,11 +15,11 @@ abstract class AbstractTest extends TestCase
 
     protected int $createdUserId;
 
-    public function createTestUser(?array $payload = null): void
+    public function createTestUser(?array $payload = null): ?array
     {
         $payload = $payload ?? [
                 'email' => 'test@gmail.com',
-                'password' => bcrypt('testtest'),
+                'password' => 'testtest',
                 'name' => 'test',
                 'lang' => 'en'
             ];
@@ -27,6 +28,13 @@ abstract class AbstractTest extends TestCase
 
         $data = $authService->registration($payload);
 
-        $this->createdUserId = $data['data']['user_id'];
+        if($data) {
+
+            $this->createdUserId = $data['user_id'];
+
+            return $data;
+        }
+
+        return null;
     }
 }
