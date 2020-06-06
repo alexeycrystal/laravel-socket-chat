@@ -54,4 +54,39 @@ class UserSettingsRepository extends AbstractRepository implements UserSettingsR
 
         return null;
     }
+
+    /**
+     * @param int $userId
+     * @param string $nickname
+     * @return bool|null
+     */
+    public function isNicknameAlreadyTaken(int $userId, string $nickname): ?bool
+    {
+        $result = DB::table('user_settings')
+            ->where('user_id', '!=', $userId)
+            ->where('nickname', '=', $nickname)
+            ->exists();
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $userId, array $payload): ?bool
+    {
+        $result = DB::table('user_settings')
+            ->where('user_id', '=', $userId)
+            ->update($payload);
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

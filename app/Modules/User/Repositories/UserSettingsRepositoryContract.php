@@ -24,4 +24,13 @@ interface UserSettingsRepositoryContract
      * @return stdClass|null
      */
     public function get(int $userId): ?\stdClass;
+
+    /**
+     * @param int $userId
+     * @param string $nickname
+     * @return bool|null
+     */
+    public function isNicknameAlreadyTaken(int $userId, string $nickname): ?bool;
+
+    public function update (int $userId, array $payload): ?bool;
 }

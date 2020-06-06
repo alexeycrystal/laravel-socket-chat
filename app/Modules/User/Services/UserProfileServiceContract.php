@@ -22,4 +22,17 @@ interface UserProfileServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function changePassword(string $password): ?bool;
+
+    /**
+     * @param array $payload
+     * @return bool|null
+     */
+    public function updateProfileSettings(array $payload): ?bool;
+
+    /**
+     * @param int $userId
+     * @param string $nickname
+     * @return bool|null
+     */
+    public function isNicknameAlreadyTaken(int $userId, string $nickname): ?bool;
 }

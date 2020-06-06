@@ -4,11 +4,11 @@
 namespace App\Modules\User\Services;
 
 
+use App\Facades\RepositoryManager;
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
-use App\Modules\User\Transformers\UserProfileTransformer;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -95,5 +95,69 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
         }
 
         return true;
+    }
+
+    /**
+     * @param array $payload
+     * @return bool|null
+     */
+    public function updateProfileSettings(array $payload): ?bool
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $result = RepositoryManager::resolveTransactional(function() use ($user, $payload) {
+
+            $userPayload = [
+                'name' => $payload['name'],
+            ];
+
+            $userId = $user->id;
+
+            $userUpdated = $this->userRepository
+                ->update($userId, $userPayload);
+
+            $userSettingsPayload = getExcludedArrayByKeys($payload, $userPayload);
+
+            $userSettingsUpdated = $this->userSettingsRepository
+                ->update($userId, $userSettingsPayload);
+
+            if(!$userUpdated
+                || !$userSettingsUpdated)
+                return null;
+
+            return true;
+        });
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'UserProfileService@isNicknameAvailable',
+            'Some temporary error happened with the database server.'
+        );
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param string $nickname
+     * @return bool|null
+     */
+    public function isNicknameAlreadyTaken(int $userId, string $nickname): ?bool
+    {
+        $result = $this->userSettingsRepository
+            ->isNicknameAlreadyTaken($userId, $nickname);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'UserProfileService@isNicknameAvailable',
+            'Some temporary error happened with the database server.'
+        );
+
+        return null;
     }
 }
