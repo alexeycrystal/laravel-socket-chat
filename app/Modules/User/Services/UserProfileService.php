@@ -6,8 +6,10 @@ namespace App\Modules\User\Services;
 
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
 use App\Modules\User\Transformers\UserProfileTransformer;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class UserProfileService
@@ -23,17 +25,24 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
      * @var UserSettingsRepositoryContract
      */
     protected UserSettingsRepositoryContract $userSettingsRepository;
+    /**
+     * @var UserRepositoryContract
+     */
+    protected UserRepositoryContract $userRepository;
 
     /**
      * UserProfileService constructor.
      * @param AuthServiceContract $authService
      * @param UserSettingsRepositoryContract $userSettingsRepository
+     * @param UserRepositoryContract $userRepository
      */
     public function __construct(AuthServiceContract $authService,
-                                UserSettingsRepositoryContract $userSettingsRepository)
+                                UserSettingsRepositoryContract $userSettingsRepository,
+                                UserRepositoryContract $userRepository)
     {
         $this->authService = $authService;
         $this->userSettingsRepository = $userSettingsRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -57,5 +66,28 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
         }
 
         return UserProfileTransformer::transform($settings);
+    }
+
+    /**
+     * @param array $payload
+     * @return array|array[]|null
+     */
+    public function changePassword(array $payload): ?array
+    {
+        $user = $this->authService
+            ->getLoggedUser();
+
+        $data = [
+            'password' => Hash::make($payload['password'])
+        ];
+
+        $result = $this->userRepository
+            ->update($user->id, $data);
+
+        return [
+            'data' => [
+                'result' => $result
+            ]
+        ];
     }
 }

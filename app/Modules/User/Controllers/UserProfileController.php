@@ -5,6 +5,7 @@ namespace App\Modules\User\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Modules\User\Requests\ChangePasswordRequest;
 use App\Modules\User\Requests\GetProfileByLoggedUserRequest;
 use App\Modules\User\Services\UserProfileServiceContract;
 
@@ -28,6 +29,22 @@ class UserProfileController extends Controller
         if(!$result || $this->userProfileService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs during the profile data receiving process.'
+            ], 400);
+    }
+
+    public function updatePassword(ChangePasswordRequest $request)
+    {
+        $payload = $request->validated();
+
+        $result = $this->userProfileService
+            ->changePassword($payload);
+
+        if($result)
+            return response()->json($result, 200);
+
+        if(!$result || $this->userProfileService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the password change process.'
             ], 400);
     }
 }

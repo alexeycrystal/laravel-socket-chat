@@ -23,4 +23,11 @@ interface UserRepositoryContract
      * @return User|null
      */
     public function create(array $payload): ?User;
+
+    /**
+     * @param int $userId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $userId, array $payload): ?bool;
 }

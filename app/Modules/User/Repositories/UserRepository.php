@@ -6,6 +6,7 @@ namespace App\Modules\User\Repositories;
 
 use App\GenericModels\User;
 use App\Generics\Repositories\AbstractRepository;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class UserRepository
@@ -38,6 +39,23 @@ class UserRepository extends AbstractRepository implements UserRepositoryContrac
 
         if($created)
             return $created;
+
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $userId, array $payload): ?bool
+    {
+        $result = DB::table('users')
+            ->where('id', '=', $userId)
+            ->update($payload);
+
+        if(isset($result))
+            return $result;
 
         return null;
     }

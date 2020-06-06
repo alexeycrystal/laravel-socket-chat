@@ -37,4 +37,6 @@ Route::group([
 
     Route::get('settings/get', 'UserProfileController@getProfileByLoggedUser');
 
+    Route::get('password/change', 'UserProfileController@updatePassword');
+
 });
