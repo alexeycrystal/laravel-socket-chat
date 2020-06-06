@@ -15,11 +15,11 @@ interface UserProfileServiceContract extends AbstractServiceContract
     /**
      * @return array|null
      */
-    public function getUserProfileInfoByLoggedUser(): ?array;
+    public function getUserProfileInfoByLoggedUser(): ?\stdClass;
 
     /**
      * @param string $password
-     * @return array|null
+     * @return bool|null
      */
-    public function changePassword(string $password): ?array;
+    public function changePassword(string $password): ?bool;
 }

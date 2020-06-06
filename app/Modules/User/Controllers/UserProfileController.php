@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\User\Requests\ChangePasswordRequest;
 use App\Modules\User\Requests\GetProfileByLoggedUserRequest;
 use App\Modules\User\Services\UserProfileServiceContract;
+use App\Modules\User\Transformers\UserPasswordChangeTransformer;
+use App\Modules\User\Transformers\UserProfileTransformer;
 
 class UserProfileController extends Controller
 {
@@ -26,7 +28,7 @@ class UserProfileController extends Controller
 
         if($result)
             return response()->json(
-                BaseDataResponseTransformer::transform($result), 200
+                UserProfileTransformer::transform($result), 200
             );
 
         if(!$result || $this->userProfileService->hasErrors())
@@ -44,7 +46,7 @@ class UserProfileController extends Controller
 
         if($result)
             return response()->json(
-                BaseDataResponseTransformer::transform($result), 200
+                UserPasswordChangeTransformer::transform($result), 200
             );
 
         if(!$result || $this->userProfileService->hasErrors())

@@ -48,7 +48,7 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
     /**
      * @return array|null
      */
-    public function getUserProfileInfoByLoggedUser(): ?array
+    public function getUserProfileInfoByLoggedUser(): ?\stdClass
     {
         $user = $this->authService->getLoggedUser();
 
@@ -65,14 +65,14 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
             return null;
         }
 
-        return UserProfileTransformer::transform($settings);
+        return $settings;
     }
 
     /**
      * @param string $password
      * @return array|array[]|null
      */
-    public function changePassword(string $password): ?array
+    public function changePassword(string $password): ?bool
     {
         $user = $this->authService
             ->getLoggedUser();
@@ -94,8 +94,6 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
             return null;
         }
 
-        return [
-            'result' => $result
-        ];
+        return true;
     }
 }
