@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tests\Unit\Modules\User;
+namespace Tests\Unit\Modules\User\Services;
 
 
 use App\Modules\Auth\Services\AuthServiceContract;
