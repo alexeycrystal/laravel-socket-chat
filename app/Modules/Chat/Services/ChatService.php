@@ -45,14 +45,12 @@ class ChatService extends AbstractService implements ChatServiceContract
     }
 
     /**
-     * @param array $payload
+     * @param array $usersIds
      * @return array|null
      */
-    public function createChat(array $payload): ?array
+    public function createChat(array $usersIds): ?array
     {
-        $chat = RepositoryManager::resolveTransactional(function() use ($payload) {
-
-            $usersIds = $payload['users_ids'];
+        $chat = RepositoryManager::resolveTransactional(function() use ($usersIds) {
 
             $isConference = count($usersIds) > 1;
 

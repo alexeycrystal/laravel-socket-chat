@@ -14,8 +14,8 @@ use App\Generics\Services\AbstractServiceContract;
 interface ChatServiceContract extends AbstractServiceContract
 {
     /**
-     * @param array $payload
+     * @param array $usersIds
      * @return array|null
      */
-    public function createChat(array $payload): ?array;
+    public function createChat(array $usersIds): ?array;
 }

@@ -41,7 +41,7 @@ class ChatController extends Controller
         $payload = $request->validated();
 
         $result = $this->chatService
-            ->createChat($payload);
+            ->createChat($payload['users_ids']);
 
         if($result)
             return response()->json(
