@@ -10,6 +10,7 @@ use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
 use Illuminate\Support\Facades\Hash;
+use stdClass;
 
 /**
  * Class UserProfileService
@@ -46,7 +47,7 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
     }
 
     /**
-     * @return array|null
+     * @return stdClass|null
      */
     public function getUserProfileInfoByLoggedUser(): ?\stdClass
     {

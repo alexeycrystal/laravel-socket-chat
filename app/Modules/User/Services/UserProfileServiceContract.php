@@ -5,6 +5,7 @@ namespace App\Modules\User\Services;
 
 
 use App\Generics\Services\AbstractServiceContract;
+use stdClass;
 
 /**
  * Interface UserProfileServiceContract
@@ -13,7 +14,7 @@ use App\Generics\Services\AbstractServiceContract;
 interface UserProfileServiceContract extends AbstractServiceContract
 {
     /**
-     * @return array|null
+     * @return stdClass|null
      */
     public function getUserProfileInfoByLoggedUser(): ?\stdClass;
 
