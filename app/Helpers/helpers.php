@@ -3,6 +3,11 @@
 
 if (!function_exists('getExcludedArrayByKeys'))
 {
+    /**
+     * @param array $main
+     * @param array $skipByKeysFromThisArray
+     * @return array
+     */
     function getExcludedArrayByKeys(array $main, array $skipByKeysFromThisArray): array
     {
         $result = [];

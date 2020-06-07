@@ -13,9 +13,20 @@ return [
 
     \App\Modules\User\Services\UserProfileServiceContract::class => \App\Modules\User\Services\UserProfileService::class,
 
+    /*
+     * Chat
+     */
+    \App\Modules\Chat\Repositories\ChatRepositoryContract::class => \App\Modules\Chat\Repositories\ChatRepository::class,
+    \App\Modules\Chat\Repositories\ChatUserRepositoryContract::class => \App\Modules\Chat\Repositories\ChatUserRepository::class,
+
     /**
      * Services
      */
+
+    /*
+     * Chat services
+     */
+    \App\Modules\Chat\Services\ChatServiceContract::class => \App\Modules\Chat\Services\ChatService::class,
 
     /*
      * Auth

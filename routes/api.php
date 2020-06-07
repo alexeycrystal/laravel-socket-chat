@@ -46,3 +46,14 @@ Route::group([
     Route::get('password/change', 'UserProfileController@updatePassword');
 
 });
+
+Route::group([
+    'prefix' => 'user',
+    'middleware' => 'jwt.auth',
+], function() {
+
+    Route::apiResources([
+        'chats' =>'App\Modules\Chat\Controllers\ChatController'
+    ]);
+
+});
