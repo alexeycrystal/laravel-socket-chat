@@ -52,8 +52,13 @@ Route::group([
     'middleware' => 'jwt.auth',
 ], function() {
 
-    Route::apiResources([
-        'chats' =>'App\Modules\Chat\Controllers\ChatController'
-    ], ['except' => ['update']]);
+    Route::apiResources(
+        ['chats' => 'App\Modules\Chat\Controllers\ChatController'],
+        ['except' => ['update']]
+    );
+
+    Route::apiResources(
+        ['contacts' => 'App\Modules\User\Controllers\UserContactController']
+    );
 
 });

@@ -11,6 +11,12 @@ namespace App\Modules\User\Services;
 interface UserContactsServiceContract
 {
     /**
+     * @param int $contactUserId
+     * @return bool|null
+     */
+    public function addContactToLoggedUser(int $contactUserId): ?bool;
+
+    /**
      * @param int $userId
      * @param array $contactsUsersIds
      * @return bool|null

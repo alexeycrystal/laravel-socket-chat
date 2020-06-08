@@ -13,5 +13,6 @@ class UserContact extends Model
     protected $fillable = [
         'user_id',
         'contact_user_id',
+        'alias',
     ];
 }

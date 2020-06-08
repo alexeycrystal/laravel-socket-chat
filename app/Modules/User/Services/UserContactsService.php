@@ -5,6 +5,7 @@ namespace App\Modules\User\Services;
 
 
 use App\Generics\Services\AbstractService;
+use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\User\Repositories\UserContactsRepositoryContract;
 
 /**
@@ -19,12 +20,37 @@ class UserContactsService extends AbstractService implements UserContactsService
     protected UserContactsRepositoryContract $userContactsRepository;
 
     /**
+     * @var AuthServiceContract
+     */
+    protected AuthServiceContract $authService;
+
+    /**
      * UserContactsService constructor.
+     * @param AuthServiceContract $authService
      * @param UserContactsRepositoryContract $userContactsRepository
      */
-    public function __construct(UserContactsRepositoryContract $userContactsRepository)
+    public function __construct(AuthServiceContract $authService,
+                                UserContactsRepositoryContract $userContactsRepository)
     {
+        $this->authService = $authService;
         $this->userContactsRepository = $userContactsRepository;
+    }
+
+    /**
+     * @param int $contactUserId
+     * @return bool|null
+     */
+    public function addContactToLoggedUser(int $contactUserId): ?bool
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $result = $this->userContactsRepository
+            ->bulkInsertContacts($user->id, [$contactUserId]);
+
+        if($result)
+            return $result;
+
+        return null;
     }
 
     /**

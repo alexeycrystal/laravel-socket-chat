@@ -138,12 +138,6 @@ class ChatService extends AbstractService implements ChatServiceContract
             if(!$chatCreated)
                 return null;
 
-            $contactsAdded = $this->userContactsService
-                ->addContacts($userOwnerId, $usersIds);
-
-            if(!$contactsAdded)
-                return null;
-
             $chatUsersPayload = [];
 
             $chatUsersIds = $usersIds;

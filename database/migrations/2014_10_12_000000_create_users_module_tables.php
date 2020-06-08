@@ -66,6 +66,8 @@ class CreateUsersModuleTables extends Migration
                 ->references('id')
                 ->on('users');
 
+            $table->string('alias', 300)->nullable();
+
             $table->unique(['user_id', 'contact_user_id']);
 
         });
