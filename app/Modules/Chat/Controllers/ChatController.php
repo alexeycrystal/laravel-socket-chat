@@ -41,12 +41,19 @@ class ChatController extends Controller
         $payload = $request->validated();
 
         $result = $this->chatService
-            ->createChat($payload['users_ids']);
+            ->createChatIfNotExists($payload['users_ids']);
 
-        if($result)
+        if($result) {
+
+            $responseCode = $result['chat_already_exists']
+                ? 200
+                : 201;
+
             return response()->json(
-                ChatTransformer::transformChatCreated($result), 201
+                ChatTransformer::transformChatCreated($result), $responseCode
             );
+        }
+
 
         if(!$result || $this->chatService->hasErrors())
             return response()->json([

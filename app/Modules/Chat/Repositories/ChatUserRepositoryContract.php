@@ -17,4 +17,11 @@ interface ChatUserRepositoryContract
      * @return bool|null
      */
     public function bulkInsert(array $payload): ?bool;
+
+    /**
+     * @param int $userId
+     * @param array $usersIds
+     * @return \stdClass|null
+     */
+    public function isAlreadyExists(int $userId, array $usersIds): ?\stdClass;
 }

@@ -45,10 +45,18 @@ class ChatServiceTest extends AbstractTest
 
         $service = $this->chatService;
 
-        $result = $service->createChat([$this->secondUserId]);
+        $result = $service->createChatIfNotExists([$this->secondUserId]);
 
         $this->assertNull($service->hasErrors());
         $this->assertIsArray($result);
         $this->assertArrayHasKey('chat_id', $result);
+        $this->assertArrayHasKey('chat_already_exists', $result);
+
+        $result = $service->createChatIfNotExists([$this->secondUserId]);
+
+        $this->assertNull($service->hasErrors());
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('chat_id', $result);
+        $this->assertArrayHasKey('chat_already_exists', $result);
     }
 }

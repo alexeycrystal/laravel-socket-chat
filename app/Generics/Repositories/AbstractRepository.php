@@ -4,6 +4,7 @@
 namespace App\Generics\Repositories;
 
 
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -69,5 +70,15 @@ abstract class AbstractRepository
         $this->errors = $this->errors->concat($errors);
 
         return true;
+    }
+
+    public function getSqlWithBindings(Builder $builder): string
+    {
+        $sql = $builder->toSql();
+        foreach($builder->getBindings() as $binding) {
+            $value = is_numeric($binding) ? $binding : "'".$binding."'";
+            $sql = preg_replace('/\?/', $value, $sql, 1);
+        }
+        return $sql;
     }
 }
