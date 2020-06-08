@@ -21,15 +21,16 @@ interface ChatServiceContract extends AbstractServiceContract
     public function createChatIfNotExists(array $usersIds): ?array;
 
     /**
+     * @param int $loggedUserId
+     * @param array $usersIds
+     * @return int|null
+     */
+    public function isChatAlreadyAssigned(int $loggedUserId, array $usersIds): ?int;
+
+    /**
      * @param int $userOwnerId
      * @param array $usersIds
      * @return Chat|null
      */
     public function createChat(int $userOwnerId, array $usersIds): ?Chat;
-
-    /**
-     * @param array $usersIds
-     * @return bool|null
-     */
-    public function isChatAlreadyAssigned(array $usersIds): ?bool;
 }

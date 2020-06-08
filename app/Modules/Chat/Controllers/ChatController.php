@@ -54,7 +54,6 @@ class ChatController extends Controller
             );
         }
 
-
         if(!$result || $this->chatService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs during the chat creation process!'

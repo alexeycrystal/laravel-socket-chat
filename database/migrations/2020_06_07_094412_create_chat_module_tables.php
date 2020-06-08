@@ -37,6 +37,8 @@ class CreateChatModuleTables extends Migration
                 ->references('id')
                 ->on('users');
 
+            $table->boolean('is_visible')->default(true);
+
             $table->unique(['chat_id', 'user_id']);
         });
     }

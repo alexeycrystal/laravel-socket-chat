@@ -52,6 +52,41 @@ class CreateUsersModuleTables extends Migration
 
             $table->index(['user_id']);
         });
+
+        Schema::create('user_contacts', function (Blueprint $table) {
+            $table->bigIncrements('id');
+
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users');
+
+            $table->unsignedBigInteger('contact_user_id');
+            $table->foreign('contact_user_id')
+                ->references('id')
+                ->on('users');
+
+            $table->unique(['user_id', 'contact_user_id']);
+
+        });
+
+        Schema::create('user_blocked_contacts', function(Blueprint $table) {
+
+            $table->bigIncrements('id');
+
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users');
+
+            $table->unsignedBigInteger('blocked_user_id');
+            $table->foreign('blocked_user_id')
+                ->references('id')
+                ->on('users');
+
+            $table->unique(['user_id', 'blocked_user_id']);
+
+        });
     }
 
     /**
@@ -61,6 +96,8 @@ class CreateUsersModuleTables extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('user_blocked_contacts');
+        Schema::dropIfExists('user_contacts');
         Schema::dropIfExists('user_settings');
         Schema::dropIfExists('users');
     }

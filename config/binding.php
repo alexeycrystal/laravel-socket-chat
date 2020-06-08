@@ -12,6 +12,7 @@ return [
     \App\Modules\User\Repositories\UserSettingsRepositoryContract::class => \App\Modules\User\Repositories\UserSettingsRepository::class,
 
     \App\Modules\User\Services\UserProfileServiceContract::class => \App\Modules\User\Services\UserProfileService::class,
+    \App\Modules\User\Repositories\UserContactsRepositoryContract::class => \App\Modules\User\Repositories\UserContactRepository::class,
 
     /*
      * Chat
@@ -27,6 +28,8 @@ return [
      * Chat services
      */
     \App\Modules\Chat\Services\ChatServiceContract::class => \App\Modules\Chat\Services\ChatService::class,
+
+    \App\Modules\User\Services\UserContactsServiceContract::class => \App\Modules\User\Services\UserContactsService::class,
 
     /*
      * Auth

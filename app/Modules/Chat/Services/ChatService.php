@@ -10,6 +10,7 @@ use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\Chat\Models\Chat;
 use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
+use App\Modules\User\Services\UserContactsServiceContract;
 use Illuminate\Support\Arr;
 
 /**
@@ -32,18 +33,26 @@ class ChatService extends AbstractService implements ChatServiceContract
     protected ChatUserRepositoryContract $chatUserRepository;
 
     /**
+     * @var UserContactsServiceContract
+     */
+    protected UserContactsServiceContract $userContactsService;
+
+    /**
      * ChatService constructor.
      * @param AuthServiceContract $authService
      * @param ChatRepositoryContract $chatRepository
      * @param ChatUserRepositoryContract $chatUserRepository
+     * @param UserContactsServiceContract $userContactsService
      */
     public function __construct(AuthServiceContract $authService,
                                 ChatRepositoryContract $chatRepository,
-                                ChatUserRepositoryContract $chatUserRepository)
+                                ChatUserRepositoryContract $chatUserRepository,
+                                UserContactsServiceContract $userContactsService)
     {
         $this->authService = $authService;
         $this->chatRepository = $chatRepository;
         $this->chatUserRepository = $chatUserRepository;
+        $this->userContactsService = $userContactsService;
     }
 
     /**
@@ -56,16 +65,11 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         $loggedUserId = $loggedUser->id;
 
-        $usersIds[] = $loggedUserId;
+        $existedChatId = $this->isChatAlreadyAssigned($loggedUserId, $usersIds);
 
-        sort($usersIds);
+        if($existedChatId) {
 
-        $existedChat = $this->chatUserRepository
-            ->isAlreadyExists($loggedUserId, $usersIds);
-
-        if($existedChat) {
-
-            $chatId = $existedChat->chat_id;
+            $chatId = $existedChatId;
         } else {
 
             $chat = $this->createChat($loggedUserId, $usersIds);
@@ -87,8 +91,29 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         return [
             'chat_id' => $chatId,
-            'chat_already_exists' => isset($existedChat),
+            'chat_already_exists' => isset($existedChatId),
         ];
+    }
+
+    /**
+     * @param int $loggedUserId
+     * @param array $usersIds
+     * @return int|null
+     */
+    public function isChatAlreadyAssigned(int $loggedUserId, array $usersIds): ?int
+    {
+        $validationUsersIds = $usersIds;
+        $validationUsersIds[] = $loggedUserId;
+
+        sort($validationUsersIds);
+
+        $existedChat = $this->chatUserRepository
+            ->isAlreadyExists($loggedUserId, $validationUsersIds);
+
+        if($existedChat)
+            return $existedChat->chat_id;
+
+        return null;
     }
 
     /**
@@ -113,9 +138,18 @@ class ChatService extends AbstractService implements ChatServiceContract
             if(!$chatCreated)
                 return null;
 
+            $contactsAdded = $this->userContactsService
+                ->addContacts($userOwnerId, $usersIds);
+
+            if(!$contactsAdded)
+                return null;
+
             $chatUsersPayload = [];
 
-            foreach($usersIds as $chatUserId)
+            $chatUsersIds = $usersIds;
+            $chatUsersIds[] = $userOwnerId;
+
+            foreach($chatUsersIds as $chatUserId)
                 $chatUsersPayload[] = [
                     'chat_id' => $chatCreated->id,
                     'user_id' => $chatUserId,
@@ -135,15 +169,5 @@ class ChatService extends AbstractService implements ChatServiceContract
             return $chat;
 
         return null;
-    }
-
-    /**
-     * @param array $usersIds
-     * @return bool|null
-     */
-    public function isChatAlreadyAssigned(array $usersIds): ?bool
-    {
-        $this->chatUserRepository
-            ->isAlreadyExists($usersIds);
     }
 }

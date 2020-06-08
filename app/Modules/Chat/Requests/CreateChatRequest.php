@@ -19,6 +19,7 @@ class CreateChatRequest extends JsonRequest
             "users_ids.*"  => [
                 'required',
                 'integer',
+                'distinct',
                 'exists:users,id'
             ],
         ];

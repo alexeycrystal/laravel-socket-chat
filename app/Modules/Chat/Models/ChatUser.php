@@ -13,6 +13,7 @@ class ChatUser extends Model
     protected $fillable = [
         'chat_id',
         'user_id',
+        'is_visible',
     ];
 
     public $timestamps = null;
