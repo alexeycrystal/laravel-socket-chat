@@ -17,6 +17,25 @@ use Illuminate\Support\Facades\DB;
 class ChatUserRepository extends AbstractRepository implements ChatUserRepositoryContract
 {
     /**
+     * @param int $userId
+     * @param int $chatId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $userId, int $chatId, array $payload): ?bool
+    {
+        $result = DB::table('chat_user')
+            ->where('chat_id', '=', $chatId)
+            ->where('user_id', '=', $userId)
+            ->update($payload);
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
+
+    /**
      * @param array $payload
      * @return bool|null
      */

@@ -14,6 +14,14 @@ use Illuminate\Support\Collection;
 interface ChatUserRepositoryContract
 {
     /**
+     * @param int $userId
+     * @param int $chatId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $userId, int $chatId, array $payload): ?bool;
+
+    /**
      * @param array $payload
      * @return bool|null
      */

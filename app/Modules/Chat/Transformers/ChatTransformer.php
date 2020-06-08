@@ -8,8 +8,17 @@ use App\Generics\Transformers\AbstractTransformer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * Class ChatTransformer
+ * @package App\Modules\Chat\Transformers
+ */
 class ChatTransformer extends AbstractTransformer
 {
+    /**
+     * @param array $payload
+     * @param Collection|null $data
+     * @return array
+     */
     public static function transformChatIndex(array $payload,
                                               ?Collection $data = null): array
     {
@@ -70,11 +79,28 @@ class ChatTransformer extends AbstractTransformer
         ];
     }
 
+    /**
+     * @param array $data
+     * @return array|array[]
+     */
     public static function transformChatCreated(array $data): array
     {
         return [
             'data' => [
                 'chat_id' => $data['chat_id']
+            ]
+        ];
+    }
+
+    /**
+     * @param bool $result
+     * @return array|\bool[][]
+     */
+    public static function chatDeleteSuccess(bool $result): array
+    {
+        return [
+            'data' => [
+                'result' => $result,
             ]
         ];
     }

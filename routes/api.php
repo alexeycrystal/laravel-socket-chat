@@ -54,6 +54,6 @@ Route::group([
 
     Route::apiResources([
         'chats' =>'App\Modules\Chat\Controllers\ChatController'
-    ]);
+    ], ['except' => ['update']]);
 
 });

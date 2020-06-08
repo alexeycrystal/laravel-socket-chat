@@ -194,4 +194,21 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         return null;
     }
+
+    /**
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function hideChatAndClearHistory(int $chatId): ?bool
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $result = $this->chatUserRepository
+            ->update($user->id, $chatId, ['is_visible' => false]);
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

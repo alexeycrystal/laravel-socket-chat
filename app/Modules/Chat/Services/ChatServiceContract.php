@@ -4,7 +4,6 @@
 namespace App\Modules\Chat\Services;
 
 
-use App\Generics\Services\AbstractService;
 use App\Generics\Services\AbstractServiceContract;
 use App\Modules\Chat\Models\Chat;
 use Illuminate\Support\Collection;
@@ -40,4 +39,10 @@ interface ChatServiceContract extends AbstractServiceContract
      * @return Chat|null
      */
     public function createChat(int $userOwnerId, array $usersIds): ?Chat;
+
+    /**
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function hideChatAndClearHistory(int $chatId): ?bool;
 }
