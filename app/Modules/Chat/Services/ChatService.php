@@ -12,6 +12,7 @@ use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
 use App\Modules\User\Services\UserContactsServiceContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * Class ChatService
@@ -31,7 +32,6 @@ class ChatService extends AbstractService implements ChatServiceContract
      * @var ChatUserRepositoryContract
      */
     protected ChatUserRepositoryContract $chatUserRepository;
-
     /**
      * @var UserContactsServiceContract
      */
@@ -167,6 +167,30 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         if($chat)
             return $chat;
+
+        return null;
+    }
+
+    /**
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getChats(array $params): ?Collection
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $params = [
+            'take' => $params['per_page'],
+            'skip' => $params['page'] > 1
+                ? $params['per_page'] * $params['page']
+                : 0,
+        ];
+
+        $result = $this->chatUserRepository
+            ->getAvailableChatsByUser($user->id, $params);
+
+        if($result)
+            return $result;
 
         return null;
     }

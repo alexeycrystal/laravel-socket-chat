@@ -4,8 +4,72 @@
 namespace App\Modules\Chat\Transformers;
 
 
-class ChatTransformer
+use App\Generics\Transformers\AbstractTransformer;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
+
+class ChatTransformer extends AbstractTransformer
 {
+    public static function transformChatIndex(array $payload,
+                                              ?Collection $data = null): array
+    {
+        $result = [];
+
+        $totalChatCount = 0;
+
+        if($data) {
+
+            $totalChatCount = $data->first()->total_chats;
+
+            $data = $data->groupBy('chat_id');
+
+            foreach($data as $chatId => $users) {
+
+                $firstRow = $users->first();
+
+                $usersCount = $users->count();
+
+                if($usersCount > 1) {
+
+                    $titles = $users->pluck('user_name')
+                        ->values()
+                        ->sort()
+                        ->implode(',');
+
+                    $chatTitle = "({$usersCount}) " . $titles;
+
+                } else {
+
+                    $chatTitle = $firstRow->user_name;
+                }
+
+                $entry = [
+                    'chat_id' => $firstRow->chat_id,
+                    'title' => $chatTitle
+                ];
+
+                $result[] = $entry;
+            }
+        }
+
+        $currentRouteName = Route::currentRouteName();
+
+        $links = self::preparePaginatedMeta(
+            $currentRouteName,
+            $payload['page'],
+            $totalChatCount,
+            $payload['per_page'],
+        );
+
+        return [
+            'data' => $result,
+            'meta' => [
+                'total_chats' => $totalChatCount,
+            ],
+            'links' => $links
+        ];
+    }
+
     public static function transformChatCreated(array $data): array
     {
         return [

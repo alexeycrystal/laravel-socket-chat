@@ -6,22 +6,21 @@ namespace App\Modules\Chat\Requests;
 
 use App\Generics\Requests\JsonRequest;
 
-class CreateChatRequest extends JsonRequest
+class IndexChatRequest extends JsonRequest
 {
     public function rules()
     {
         return [
-            'users_ids' => [
-                'required',
-                'array',
-                'min:1',
-            ],
-            "users_ids.*"  => [
+            'page' => [
                 'required',
                 'integer',
-                'distinct',
-                'exists:users,id'
+                "min:1",
             ],
+            'per_page' => [
+                'required',
+                'integer',
+                'min:1'
+            ]
         ];
     }
 }

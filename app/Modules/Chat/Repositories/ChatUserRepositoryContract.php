@@ -4,7 +4,8 @@
 namespace App\Modules\Chat\Repositories;
 
 
-use App\Generics\Services\AbstractServiceContract;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 
 /**
  * Interface ChatUserRepositoryContract
@@ -24,4 +25,11 @@ interface ChatUserRepositoryContract
      * @return \stdClass|null
      */
     public function isAlreadyExists(int $userId, array $usersIds): ?\stdClass;
+
+    /**
+     * @param int $userId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getAvailableChatsByUser(int $userId, array $params): ?Collection;
 }

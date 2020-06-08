@@ -5,7 +5,8 @@ namespace App\Modules\Chat\Controllers;
 
 
 use App\Http\Controllers\Controller;
-use App\Modules\Chat\Requests\CreateChatRequest;
+use App\Modules\Chat\Requests\IndexChatRequest;
+use App\Modules\Chat\Requests\StoreChatRequest;
 use App\Modules\Chat\Services\ChatServiceContract;
 use App\Modules\Chat\Transformers\ChatTransformer;
 use Illuminate\Http\JsonResponse;
@@ -23,20 +24,34 @@ class ChatController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param IndexChatRequest $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(IndexChatRequest $request)
     {
-        //
+        $payload = $request->validated();
+
+        $result = $this->chatService
+            ->getChats($payload);
+
+        if($result)
+            return response()->json(
+                ChatTransformer::transformChatIndex($payload, $result), 200
+            );
+
+        if(!$result || $this->chatService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs when receiving the list of user chats!'
+            ], 400);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param CreateChatRequest $request
+     * @param StoreChatRequest $request
      * @return JsonResponse
      */
-    public function store(CreateChatRequest $request)
+    public function store(StoreChatRequest $request)
     {
         $payload = $request->validated();
 

@@ -7,6 +7,7 @@ namespace App\Modules\Chat\Services;
 use App\Generics\Services\AbstractService;
 use App\Generics\Services\AbstractServiceContract;
 use App\Modules\Chat\Models\Chat;
+use Illuminate\Support\Collection;
 
 /**
  * Interface ChatServiceContract
@@ -14,6 +15,12 @@ use App\Modules\Chat\Models\Chat;
  */
 interface ChatServiceContract extends AbstractServiceContract
 {
+    /**
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getChats(array $params): ?Collection;
+
     /**
      * @param array $usersIds
      * @return array|null

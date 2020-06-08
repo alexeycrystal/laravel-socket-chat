@@ -6,6 +6,8 @@ namespace App\Modules\Chat\Repositories;
 
 use App\Generics\Repositories\AbstractRepository;
 use App\Modules\Chat\Models\Chat;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ChatRepository
