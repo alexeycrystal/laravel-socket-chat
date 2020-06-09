@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\User\Requests\UserContact\IndexUserContactsRequest;
 use App\Modules\User\Requests\UserContact\ShowUserContactRequest;
 use App\Modules\User\Requests\UserContact\StoreUserContactRequest;
+use App\Modules\User\Requests\UserContact\UpdateUserContactRequest;
 use App\Modules\User\Services\UserContactsServiceContract;
 use App\Modules\User\Transformers\UserContact\UserContactTransformer;
 use Illuminate\Http\JsonResponse;
@@ -48,7 +49,7 @@ class UserContactController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreUserContactRequest $request
      * @return JsonResponse
      */
     public function store(StoreUserContactRequest $request)
@@ -97,13 +98,26 @@ class UserContactController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param UpdateUserContactRequest $request
+     * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserContactRequest $request, $id)
     {
-        //
+        $payload = $request->validated();
+
+        $result = $this->userContactsService
+            ->update($payload['id'], $payload);
+
+        if($result)
+            return response()->json(
+                UserContactTransformer::transformContactUpdate($result), 201
+            );
+
+        if(!$result || $this->userContactsService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the contact update process.'
+            ], 400);
     }
 
     /**

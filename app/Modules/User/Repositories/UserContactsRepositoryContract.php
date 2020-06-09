@@ -38,4 +38,11 @@ interface UserContactsRepositoryContract
      * @return \stdClass|null
      */
     public function get($contactId): ?\stdClass;
+
+    /**
+     * @param int $contactId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $contactId, array $payload): ?bool;
 }

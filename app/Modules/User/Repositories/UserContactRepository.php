@@ -129,4 +129,21 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
 
         return null;
     }
+
+    /**
+     * @param int $contactId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $contactId, array $payload): ?bool
+    {
+        $result = DB::table('user_contacts')
+            ->where('id', '=', $contactId)
+            ->update($payload);
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

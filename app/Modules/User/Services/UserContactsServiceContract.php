@@ -44,4 +44,11 @@ interface UserContactsServiceContract extends AbstractServiceContract
      * @return \stdClass|null
      */
     public function getContact(int $contactId): ?\stdClass;
+
+    /**
+     * @param int $contactId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $contactId, array $payload): ?bool;
 }

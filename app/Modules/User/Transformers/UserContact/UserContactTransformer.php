@@ -82,4 +82,13 @@ class UserContactTransformer extends AbstractTransformer
             ]
         ];
     }
+
+    public static function transformContactUpdate(bool $result): array
+    {
+        return [
+            'data' => [
+                'result' => $result
+            ]
+        ];
+    }
 }

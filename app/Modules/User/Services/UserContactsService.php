@@ -133,4 +133,29 @@ class UserContactsService extends AbstractService implements UserContactsService
         );
         return null;
     }
+
+    /**
+     * @param int $contactId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $contactId, array $payload): ?bool
+    {
+        $params = [
+            'alias' => $payload['alias'] ?? null,
+        ];
+
+        $result = $this->userContactsRepository
+            ->update($contactId, $params);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'UserContactService@getContact',
+            'Some error occurs in the database.'
+        );
+        return null;
+    }
 }
