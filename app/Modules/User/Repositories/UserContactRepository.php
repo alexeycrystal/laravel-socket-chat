@@ -146,4 +146,20 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
 
         return null;
     }
+
+    /**
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function delete(int $contactId): ?bool
+    {
+        $result = DB::table('user_contacts')
+            ->where('id', '=', $contactId)
+            ->delete();
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Modules\User\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Modules\User\Requests\UserContact\DestroyUserContactRequest;
 use App\Modules\User\Requests\UserContact\IndexUserContactsRequest;
 use App\Modules\User\Requests\UserContact\ShowUserContactRequest;
 use App\Modules\User\Requests\UserContact\StoreUserContactRequest;
@@ -111,7 +112,7 @@ class UserContactController extends Controller
 
         if($result)
             return response()->json(
-                UserContactTransformer::transformContactUpdate($result), 201
+                UserContactTransformer::transformContactUpdate($result), 202
             );
 
         if(!$result || $this->userContactsService->hasErrors())
@@ -123,11 +124,25 @@ class UserContactController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param DestroyUserContactRequest $request
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(DestroyUserContactRequest $request, $id)
     {
-        //
+        $payload = $request->validated();
+
+        $result = $this->userContactsService
+            ->delete($payload['id']);
+
+        if($result)
+            return response()->json(
+                UserContactTransformer::transformContactDestroy($result), 200
+            );
+
+        if(!$result || $this->userContactsService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the contact destroy process.'
+            ], 400);
     }
 }

@@ -158,4 +158,24 @@ class UserContactsService extends AbstractService implements UserContactsService
         );
         return null;
     }
+
+    /**
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function delete(int $contactId): ?bool
+    {
+        $result = $this->userContactsRepository
+            ->delete($contactId);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'UserContactService@getContact',
+            'Some error occurs in the database.'
+        );
+        return null;
+    }
 }

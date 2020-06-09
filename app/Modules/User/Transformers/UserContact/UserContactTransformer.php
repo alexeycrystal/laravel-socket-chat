@@ -91,4 +91,13 @@ class UserContactTransformer extends AbstractTransformer
             ]
         ];
     }
+
+    public static function transformContactDestroy(bool $result): array
+    {
+        return [
+            'data' => [
+                'result' => $result,
+            ]
+        ];
+    }
 }

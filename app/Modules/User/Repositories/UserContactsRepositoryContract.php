@@ -45,4 +45,10 @@ interface UserContactsRepositoryContract
      * @return bool|null
      */
     public function update(int $contactId, array $payload): ?bool;
+
+    /**
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function delete(int $contactId): ?bool;
 }
