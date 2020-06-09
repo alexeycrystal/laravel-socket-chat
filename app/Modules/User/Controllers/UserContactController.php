@@ -6,6 +6,7 @@ namespace App\Modules\User\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\User\Requests\UserContact\IndexUserContactsRequest;
+use App\Modules\User\Requests\UserContact\ShowUserContactRequest;
 use App\Modules\User\Requests\UserContact\StoreUserContactRequest;
 use App\Modules\User\Services\UserContactsServiceContract;
 use App\Modules\User\Transformers\UserContact\UserContactTransformer;
@@ -71,12 +72,26 @@ class UserContactController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param ShowUserContactRequest $request
+     * @param int $id
      * @return JsonResponse
      */
-    public function show($id)
+    public function show(ShowUserContactRequest $request, $id)
     {
-        //
+        $params = $request->validated();
+
+        $result = $this->userContactsService
+            ->getContact($params['id']);
+
+        if($result)
+            return response()->json(
+                UserContactTransformer::transformContactShow($result), 201
+            );
+
+        if(!$result || $this->userContactsService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the contact creation process.'
+            ], 400);
     }
 
     /**

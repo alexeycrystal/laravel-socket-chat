@@ -32,7 +32,7 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
                     ->where('contact.user_id', '=', $userId);
             })
             ->select([
-                'user.id as contact_id',
+                'contact.id as contact_id',
                 'user.name as contact_name',
             ])
             ->selectRaw('count("contact"."contact_user_id") over() as total_contacts')
@@ -76,6 +76,55 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
         $result = DB::statement($sql);
 
         if(isset($result))
+            return $result;
+
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function isContactExistsByUser(int $userId, int $contactId): ?bool
+    {
+        $result = DB::table('user_contacts')
+            ->where('id', '=', $contactId)
+            ->where('user_id', '=', $userId)
+            ->exists();
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
+
+    /**
+     * @param $contactId
+     * @return \stdClass|null
+     */
+    public function get($contactId): ?\stdClass
+    {
+        $query = DB::table('user_contacts as contact')
+            ->join('users as user', function(Builder $query) use ($contactId) {
+
+                $query->on('user.id', '=', 'contact.contact_user_id')
+                    ->where('contact.id', '=', $contactId);
+            })
+            ->join('user_settings as settings', 'user.id', '=', 'settings.user_id')
+            ->select([
+                'contact.id as id',
+                'contact.alias',
+
+                'user.name',
+
+                'settings.nickname',
+                'settings.avatar_path',
+            ]);
+
+        $result = $query->first();
+
+        if($result)
             return $result;
 
         return null;

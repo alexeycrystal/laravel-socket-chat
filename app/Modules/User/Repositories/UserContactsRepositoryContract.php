@@ -25,4 +25,17 @@ interface UserContactsRepositoryContract
      * @return bool|null
      */
     public function bulkInsertContacts(int $userId, array $contactUsersIds): ?bool;
+
+    /**
+     * @param int $userId
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function isContactExistsByUser(int $userId, int $contactId): ?bool;
+
+    /**
+     * @param $contactId
+     * @return \stdClass|null
+     */
+    public function get($contactId): ?\stdClass;
 }

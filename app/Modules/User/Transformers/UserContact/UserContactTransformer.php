@@ -15,19 +15,6 @@ use Illuminate\Support\Facades\Route;
 class UserContactTransformer extends AbstractTransformer
 {
     /**
-     * @param bool $result
-     * @return array|\bool[][]
-     */
-    public static function transformContactStore(bool $result): array
-    {
-        return [
-            'data' => [
-                'result' => $result
-            ]
-        ];
-    }
-
-    /**
      * @param array $params
      * @param Collection $data
      * @return array
@@ -68,6 +55,31 @@ class UserContactTransformer extends AbstractTransformer
                 'contacts' => $result,
             ],
             'links' => $links,
+        ];
+    }
+
+    /**
+     * @param bool $result
+     * @return array|\bool[][]
+     */
+    public static function transformContactStore(bool $result): array
+    {
+        return [
+            'data' => [
+                'result' => $result
+            ]
+        ];
+    }
+
+    public static function transformContactShow(\stdClass $contact)
+    {
+        return [
+            'data' => [
+                'id' => $contact->id,
+                'name' => $contact->alias ?? $contact->name,
+                'nickname' => $contact->nickname,
+                'avatar' => $contact->avatar_path,
+            ]
         ];
     }
 }

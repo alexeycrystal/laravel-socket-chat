@@ -31,4 +31,17 @@ interface UserContactsServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function addContacts(int $userId, array $contactsUsersIds): ?bool;
+
+    /**
+     * @param int $userId
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function isContactExistsByUser(int $userId, int $contactId): ?bool;
+
+    /**
+     * @param int $contactId
+     * @return \stdClass|null
+     */
+    public function getContact(int $contactId): ?\stdClass;
 }

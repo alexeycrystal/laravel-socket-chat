@@ -92,4 +92,45 @@ class UserContactsService extends AbstractService implements UserContactsService
 
         return null;
     }
+
+    /**
+     * @param int $userId
+     * @param int $contactId
+     * @return bool|null
+     */
+    public function isContactExistsByUser(int $userId, int $contactId): ?bool
+    {
+        $result = $this->userContactsRepository
+            ->isContactExistsByUser($userId, $contactId);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'UserContactService@isContactExistsByUser',
+            'Some error occurs in the database.'
+        );
+        return null;
+    }
+
+    /**
+     * @param int $contactId
+     * @return \stdClass|null
+     */
+    public function getContact(int $contactId): ?\stdClass
+    {
+        $result = $this->userContactsRepository
+            ->get($contactId);
+
+        if($result)
+            return $result;
+
+        $this->addError(
+            504,
+            'UserContactService@getContact',
+            'Some error occurs in the database.'
+        );
+        return null;
+    }
 }
