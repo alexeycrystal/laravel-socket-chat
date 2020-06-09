@@ -56,6 +56,30 @@ class ChatService extends AbstractService implements ChatServiceContract
     }
 
     /**
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getChats(array $params): ?Collection
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $params = [
+            'take' => $params['per_page'],
+            'skip' => $params['page'] > 1
+                ? $params['per_page'] * $params['page']
+                : 0,
+        ];
+
+        $result = $this->chatUserRepository
+            ->getAvailableChatsByUser($user->id, $params);
+
+        if($result)
+            return $result;
+
+        return null;
+    }
+
+    /**
      * @param array $usersIds
      * @return array|null
      */
@@ -161,30 +185,6 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         if($chat)
             return $chat;
-
-        return null;
-    }
-
-    /**
-     * @param array $params
-     * @return Collection|null
-     */
-    public function getChats(array $params): ?Collection
-    {
-        $user = $this->authService->getLoggedUser();
-
-        $params = [
-            'take' => $params['per_page'],
-            'skip' => $params['page'] > 1
-                ? $params['per_page'] * $params['page']
-                : 0,
-        ];
-
-        $result = $this->chatUserRepository
-            ->getAvailableChatsByUser($user->id, $params);
-
-        if($result)
-            return $result;
 
         return null;
     }

@@ -7,6 +7,7 @@ namespace App\Modules\User\Services;
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\User\Repositories\UserContactsRepositoryContract;
+use Illuminate\Support\Collection;
 
 /**
  * Class UserContactsService
@@ -18,7 +19,6 @@ class UserContactsService extends AbstractService implements UserContactsService
      * @var UserContactsRepositoryContract
      */
     protected UserContactsRepositoryContract $userContactsRepository;
-
     /**
      * @var AuthServiceContract
      */
@@ -34,6 +34,30 @@ class UserContactsService extends AbstractService implements UserContactsService
     {
         $this->authService = $authService;
         $this->userContactsRepository = $userContactsRepository;
+    }
+
+    /**
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getContactsByParams(array $params): ?Collection
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $payload = [
+            'take' => $params['per_page'],
+            'skip' => $params['page'] > 1
+                ? $params['per_page'] * $params['page']
+                : 0,
+        ];
+
+        $result = $this->userContactsRepository
+            ->getContactsByParams($user->id, $payload);
+
+        if($result)
+            return $result;
+
+        return null;
     }
 
     /**

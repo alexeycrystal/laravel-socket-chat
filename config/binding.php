@@ -5,9 +5,6 @@ return [
      * Repositories
      */
 
-    /*
-     * Users
-     */
     \App\Modules\User\Repositories\UserRepositoryContract::class => \App\Modules\User\Repositories\UserRepository::class,
     \App\Modules\User\Repositories\UserSettingsRepositoryContract::class => \App\Modules\User\Repositories\UserSettingsRepository::class,
 
@@ -24,20 +21,11 @@ return [
      * Services
      */
 
-    /*
-     * Chat services
-     */
     \App\Modules\Chat\Services\ChatServiceContract::class => \App\Modules\Chat\Services\ChatService::class,
 
     \App\Modules\User\Services\UserContactsServiceContract::class => \App\Modules\User\Services\UserContactsService::class,
 
-    /*
-     * Auth
-     */
     \App\Modules\Auth\Services\JWTServiceContract::class => \App\Modules\Auth\Services\JWTService::class,
 
-    /*
-     * IP Services
-     */
     \App\Services\IP\LocationIPServiceContract::class => \App\Services\IP\LocationIPService::class,
 ];

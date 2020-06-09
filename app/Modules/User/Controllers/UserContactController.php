@@ -5,7 +5,8 @@ namespace App\Modules\User\Controllers;
 
 
 use App\Http\Controllers\Controller;
-use App\Modules\User\Requests\UserContact\UserContactStoreRequest;
+use App\Modules\User\Requests\UserContact\IndexUserContactsRequest;
+use App\Modules\User\Requests\UserContact\StoreUserContactRequest;
 use App\Modules\User\Services\UserContactsServiceContract;
 use App\Modules\User\Transformers\UserContact\UserContactTransformer;
 use Illuminate\Http\JsonResponse;
@@ -23,11 +24,24 @@ class UserContactController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param IndexUserContactsRequest $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(IndexUserContactsRequest $request)
     {
-        //
+        $params = $request->validated();
+
+        $result = $this->userContactsService
+            ->getContactsByParams($params);
+
+        if($this->userContactsService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the contacts receiving process.'
+            ], 400);
+
+        return response()->json(
+            UserContactTransformer::transformContactIndex($params, $result), 200
+        );
     }
 
     /**
@@ -36,7 +50,7 @@ class UserContactController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return JsonResponse
      */
-    public function store(UserContactStoreRequest $request)
+    public function store(StoreUserContactRequest $request)
     {
         $payload = $request->validated();
 

@@ -4,12 +4,21 @@
 namespace App\Modules\User\Repositories;
 
 
+use Illuminate\Support\Collection;
+
 /**
  * Interface UserContactsRepositoryContract
  * @package App\Modules\User\Repositories
  */
 interface UserContactsRepositoryContract
 {
+    /**
+     * @param int $userId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getContactsByParams(int $userId, array $params): ?Collection;
+
     /**
      * @param int $userId
      * @param array $contactUsersIds

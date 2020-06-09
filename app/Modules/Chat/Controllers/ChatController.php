@@ -34,15 +34,14 @@ class ChatController extends Controller
         $result = $this->chatService
             ->getChats($payload);
 
-        if($result)
-            return response()->json(
-                ChatTransformer::transformChatIndex($payload, $result), 200
-            );
-
-        if(!$result || $this->chatService->hasErrors())
+        if($this->chatService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs when receiving the list of user chats!'
             ], 400);
+
+        return response()->json(
+            ChatTransformer::transformChatIndex($payload, $result), 200
+        );
     }
 
     /**

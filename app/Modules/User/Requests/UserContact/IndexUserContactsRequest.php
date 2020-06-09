@@ -6,15 +6,20 @@ namespace App\Modules\User\Requests\UserContact;
 
 use App\Generics\Requests\JsonRequest;
 
-class UserContactStoreRequest extends JsonRequest
+class IndexUserContactsRequest extends JsonRequest
 {
     public function rules()
     {
         return [
-            'contact_user_id' => [
+            'page' => [
                 'required',
                 'integer',
-                'exists:users,id',
+                "min:1",
+            ],
+            'per_page' => [
+                'required',
+                'integer',
+                'min:1',
             ],
         ];
     }

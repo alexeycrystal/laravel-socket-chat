@@ -63,6 +63,10 @@ class ChatTransformer extends AbstractTransformer
 
         $currentRouteName = Route::currentRouteName();
 
+        $meta = [
+            'total_chats' => $totalChatCount,
+        ];
+
         $links = self::preparePaginatedMeta(
             $currentRouteName,
             $payload['page'],
@@ -70,11 +74,10 @@ class ChatTransformer extends AbstractTransformer
             $payload['per_page'],
         );
 
+        $links['meta'] = $meta;
+
         return [
             'data' => $result,
-            'meta' => [
-                'total_chats' => $totalChatCount,
-            ],
             'links' => $links
         ];
     }
