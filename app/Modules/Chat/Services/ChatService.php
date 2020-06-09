@@ -205,4 +205,20 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         return null;
     }
+
+    /**
+     * @param int $userId
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function isUserExistsByChat(int $userId, int $chatId): ?bool
+    {
+        $result = $this->chatUserRepository
+            ->isUserExistsByChat($userId, $chatId);
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

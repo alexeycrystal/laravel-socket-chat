@@ -45,4 +45,11 @@ interface ChatServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function hideChatAndClearHistory(int $chatId): ?bool;
+
+    /**
+     * @param int $userId
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function isUserExistsByChat(int $userId, int $chatId): ?bool;
 }

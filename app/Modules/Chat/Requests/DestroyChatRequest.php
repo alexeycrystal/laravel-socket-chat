@@ -5,6 +5,9 @@ namespace App\Modules\Chat\Requests;
 
 
 use App\Generics\Requests\JsonRequest;
+use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Chat\Rules\UserChatPermissionValidationRule;
+use App\Modules\Chat\Services\ChatServiceContract;
 
 class DestroyChatRequest extends JsonRequest
 {
@@ -17,13 +20,14 @@ class DestroyChatRequest extends JsonRequest
         return $data;
     }
 
-    public function rules()
+    public function rules(AuthServiceContract $authService,
+                          ChatServiceContract $chatService)
     {
         return [
             'id' => [
                 'required',
                 'integer',
-                'exists:chats,id',
+                new UserChatPermissionValidationRule($authService, $chatService),
             ]
         ];
     }

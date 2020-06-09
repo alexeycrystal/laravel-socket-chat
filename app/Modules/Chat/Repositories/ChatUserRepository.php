@@ -144,4 +144,22 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
 
         return null;
     }
+
+    /**
+     * @param int $userId
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function isUserExistsByChat(int $userId, int $chatId): ?bool
+    {
+        $result = DB::table('chat_user')
+            ->where('chat_id', '=', $chatId)
+            ->where('user_id', '=', $userId)
+            ->exists();
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

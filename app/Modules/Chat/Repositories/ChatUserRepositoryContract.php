@@ -40,4 +40,11 @@ interface ChatUserRepositoryContract
      * @return Collection|null
      */
     public function getAvailableChatsByUser(int $userId, array $params): ?Collection;
+
+    /**
+     * @param int $userId
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function isUserExistsByChat(int $userId, int $chatId): ?bool;
 }
