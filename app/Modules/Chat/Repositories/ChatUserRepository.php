@@ -56,7 +56,7 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
      */
     public function isAlreadyExists(int $userId, array $usersIds): ?\stdClass
     {
-        $jsonUserIds = json_encode($usersIds);
+        $strUserIds = implode(',', $usersIds);
 
         $withQuery = DB::table('chat_user')
             ->where('chat_user.user_id', '=', $userId)
@@ -79,9 +79,14 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
                             ->orderBy('user_id');
                     }, 'chat_selections')
                     ->selectRaw('distinct on(chat_id) chat_id')
-                    ->selectRaw('json_strip_nulls(json_agg(user_id) over(partition by chat_id)) as users_json')
+                    ->selectRaw("
+                        array_to_string(
+                            array_sort(
+                                array_agg(user_id) over(partition by chat_id)
+                            )
+                        , ',') as users_json")
             , 'result')
-            ->whereRaw("users_json::varchar = '{$jsonUserIds}'::varchar")
+            ->whereRaw("users_json::varchar = '{$strUserIds}'::varchar")
             ->limit(1);
 
         $result = $query->first();
