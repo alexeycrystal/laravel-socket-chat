@@ -17,4 +17,18 @@ interface MessageRepositoryContract
      * @return Message|null
      */
     public function create(array $payload): ?Message;
+
+    /**
+     * @param int $userId
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function isExistsByUser(int $userId, int $messageId): ?bool;
+
+    /**
+     * @param int $messageId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function update(int $messageId, array $payload): ?bool;
 }

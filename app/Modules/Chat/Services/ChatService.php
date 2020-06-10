@@ -107,7 +107,7 @@ class ChatService extends AbstractService implements ChatServiceContract
 
             $this->addError(
                 504,
-                'ChatService@createChat',
+                'ChatService@createChatIfNotExists',
                 'Some serious error occurs during the chat creation process.'
             );
             return null;
@@ -203,6 +203,12 @@ class ChatService extends AbstractService implements ChatServiceContract
         if(isset($result))
             return $result;
 
+        $this->addError(
+            504,
+            'ChatService@hideChatAndClearHistory',
+            'Some serious error occurs during the chat update process.'
+        );
+
         return null;
     }
 
@@ -219,6 +225,11 @@ class ChatService extends AbstractService implements ChatServiceContract
         if(isset($result))
             return $result;
 
+        $this->addError(
+            504,
+            'ChatService@isUserExistsByChat',
+            'Some serious error occurs during the chat user validation process.'
+        );
         return null;
     }
 }

@@ -17,4 +17,18 @@ interface MessageServiceContract extends AbstractServiceContract
      * @return int|null
      */
     public function createByLoggedUser(array $payload): ?int;
+
+    /**
+     * @param int $userId
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function isMessageExistsByUser(int $userId, int $messageId): ?bool;
+
+    /**
+     * @param int $messageId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function updateMessage(int $messageId, array $payload): ?bool;
 }

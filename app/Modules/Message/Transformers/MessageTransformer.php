@@ -17,4 +17,13 @@ class MessageTransformer extends AbstractTransformer
             ]
         ];
     }
+
+    public static function transformMessageUpdate(bool $result): array
+    {
+        return [
+            'data' => [
+                'result' => $result,
+            ]
+        ];
+    }
 }

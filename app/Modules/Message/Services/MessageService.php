@@ -55,6 +55,57 @@ class MessageService extends AbstractService implements MessageServiceContract
         if($message)
             return $message->id;
 
+        $this->addError(
+            504,
+            'MessageService@createByLoggedUser',
+            'Some serious error occurs during the message creation process.'
+        );
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function isMessageExistsByUser(int $userId, int $messageId): ?bool
+    {
+        $result = $this->messageRepository
+            ->isExistsByUser($userId, $messageId);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'MessageService@isMessageExistsByUser',
+            'Some serious error occurs during the chat message validation process.'
+        );
+        return null;
+    }
+
+    /**
+     * @param int $messageId
+     * @param array $payload
+     * @return bool|null
+     */
+    public function updateMessage(int $messageId, array $payload): ?bool
+    {
+        $data = [
+            'text' => $payload['text'],
+        ];
+
+        $result = $this->messageRepository
+            ->update($messageId, $data);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'MessageService@updateMessage',
+            'Some serious error occurs during the chat message validation process.'
+        );
         return null;
     }
 }

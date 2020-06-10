@@ -7,6 +7,7 @@ namespace App\Modules\Message\Controllers;
 use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
 use App\Modules\Message\Requests\StoreMessageRequest;
+use App\Modules\Message\Requests\UpdateMessageRequest;
 use App\Modules\Message\Services\MessageServiceContract;
 use App\Modules\Message\Transformers\MessageTransformer;
 use Illuminate\Http\JsonResponse;
@@ -69,13 +70,26 @@ class MessageController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param UpdateMessageRequest $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(UpdateMessageRequest $request, $id)
     {
-        //
+        $payload = $request->validated();
+
+        $result = $this->messageService
+            ->updateMessage($payload['id'], $payload);
+
+        if($result)
+            return response()->json(
+                MessageTransformer::transformMessageUpdate($result), 201
+            );
+
+        if(!$result || $this->messageService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the message update process!'
+            ], 400);
     }
 
     /**
