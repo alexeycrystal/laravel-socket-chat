@@ -31,4 +31,10 @@ interface MessageServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function updateMessage(int $messageId, array $payload): ?bool;
+
+    /**
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function deleteMessage(int $messageId): ?bool;
 }

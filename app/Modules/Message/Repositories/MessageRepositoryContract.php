@@ -31,4 +31,10 @@ interface MessageRepositoryContract
      * @return bool|null
      */
     public function update(int $messageId, array $payload): ?bool;
+
+    /**
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function delete(int $messageId): ?bool;
 }

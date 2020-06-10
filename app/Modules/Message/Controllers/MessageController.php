@@ -6,6 +6,7 @@ namespace App\Modules\Message\Controllers;
 
 use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
+use App\Modules\Message\Requests\DestroyMessageRequest;
 use App\Modules\Message\Requests\StoreMessageRequest;
 use App\Modules\Message\Requests\UpdateMessageRequest;
 use App\Modules\Message\Services\MessageServiceContract;
@@ -95,11 +96,25 @@ class MessageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param DestroyMessageRequest $request
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(DestroyMessageRequest $request, $id)
     {
-        //
+        $payload = $request->validated();
+
+        $result = $this->messageService
+            ->deleteMessage($payload['id']);
+
+        if($result)
+            return response()->json(
+                MessageTransformer::transformMessageDestroy($result), 200
+            );
+
+        if(!$result || $this->messageService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the message deletion process!'
+            ], 400);
     }
 }

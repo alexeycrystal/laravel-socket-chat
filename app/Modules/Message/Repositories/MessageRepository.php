@@ -62,4 +62,20 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryC
 
         return null;
     }
+
+    /**
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function delete(int $messageId): ?bool
+    {
+        $result = DB::table('messages')
+            ->where('id', '=', $messageId)
+            ->delete();
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
 }

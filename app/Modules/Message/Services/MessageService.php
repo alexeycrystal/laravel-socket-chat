@@ -108,4 +108,24 @@ class MessageService extends AbstractService implements MessageServiceContract
         );
         return null;
     }
+
+    /**
+     * @param int $messageId
+     * @return bool|null
+     */
+    public function deleteMessage(int $messageId): ?bool
+    {
+        $result = $this->messageRepository
+            ->delete($messageId);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'MessageService@deleteMessage',
+            'Some serious error occurs during the message deletion process.'
+        );
+        return null;
+    }
 }
