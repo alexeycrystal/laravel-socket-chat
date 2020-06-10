@@ -61,4 +61,8 @@ Route::group([
         ['contacts' => 'App\Modules\User\Controllers\UserContactController']
     );
 
+    Route::apiResources(
+        ['messages' => 'App\Modules\Message\Controllers\MessageController']
+    );
+
 });
