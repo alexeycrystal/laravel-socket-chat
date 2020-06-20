@@ -85,7 +85,7 @@ class AuthService extends AbstractService implements AuthServiceContract
         /**
          * For tests
          */
-        broadcast(new MessagePushed(1));
+        //broadcast(new MessagePushed(1));
 
         return [
             'token' => $token,
