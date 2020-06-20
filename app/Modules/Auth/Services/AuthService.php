@@ -4,6 +4,7 @@
 namespace App\Modules\Auth\Services;
 
 
+use App\Events\MessagePushed;
 use App\Facades\RepositoryManager;
 use App\GenericModels\User;
 use App\Generics\Services\AbstractService;
@@ -80,6 +81,11 @@ class AuthService extends AbstractService implements AuthServiceContract
             );
             return null;
         }
+
+        /**
+         * For tests
+         */
+        broadcast(new MessagePushed(1));
 
         return [
             'token' => $token,

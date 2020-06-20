@@ -4,15 +4,14 @@
 namespace App\Modules\Message\Controllers;
 
 
-use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
 use App\Modules\Message\Requests\DestroyMessageRequest;
+use App\Modules\Message\Requests\IndexMessagesRequest;
 use App\Modules\Message\Requests\StoreMessageRequest;
 use App\Modules\Message\Requests\UpdateMessageRequest;
 use App\Modules\Message\Services\MessageServiceContract;
 use App\Modules\Message\Transformers\MessageTransformer;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
@@ -28,9 +27,9 @@ class MessageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(IndexMessagesRequest $request)
     {
-        //
+
     }
 
     /**

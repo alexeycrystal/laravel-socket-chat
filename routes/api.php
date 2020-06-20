@@ -64,5 +64,4 @@ Route::group([
     Route::apiResources(
         ['messages' => 'App\Modules\Message\Controllers\MessageController']
     );
-
 });
