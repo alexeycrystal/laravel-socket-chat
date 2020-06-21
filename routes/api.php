@@ -5,9 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 
 if(!headers_sent()) {
-
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Request-With, GoogleDataStudio');
+    header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Request-With');
     header('Access-Control-Allow-Credentials: true');
 }
 
@@ -34,7 +33,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'profile',
-    'middleware' => 'jwt.auth',
+    'middleware' => ['jwt.validate'],
     'namespace' => 'App\Modules\User\Controllers'
 ], function() {
 
@@ -48,7 +47,7 @@ Route::group([
 
 Route::group([
     'prefix' => 'user',
-    'middleware' => 'jwt.auth',
+    'middleware' => 'jwt.validate',
 ], function() {
 
     Route::apiResources(
