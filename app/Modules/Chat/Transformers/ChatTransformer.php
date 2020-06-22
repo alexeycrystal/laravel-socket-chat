@@ -7,6 +7,7 @@ namespace App\Modules\Chat\Transformers;
 use App\Generics\Transformers\AbstractTransformer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ChatTransformer
@@ -25,6 +26,9 @@ class ChatTransformer extends AbstractTransformer
         $result = [];
 
         $totalChatCount = 0;
+
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+        $defaultGroupAvatar = config('app.url') . '/storage/avatars/default/default_group_avatar.png';
 
         if($data) {
 
@@ -47,14 +51,20 @@ class ChatTransformer extends AbstractTransformer
 
                     $chatTitle = "({$usersCount}) " . $titles;
 
+                    $avatar = $defaultGroupAvatar;
+
                 } else {
 
                     $chatTitle = $firstRow->user_name;
+                    $avatar = $firstRow->avatar_path
+                        ? config('app.url') . $firstRow->avatar_path
+                        : $defaultAvatarUrl;
                 }
 
                 $entry = [
                     'chat_id' => $firstRow->chat_id,
-                    'title' => $chatTitle
+                    'title' => $chatTitle,
+                    'avatar' => $avatar,
                 ];
 
                 $result[] = $entry;

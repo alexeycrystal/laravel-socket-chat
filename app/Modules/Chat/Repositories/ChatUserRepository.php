@@ -130,11 +130,13 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
                 $query->on('u.id', '=', 'chat_user.user_id')
                     ->where('u.id', '!=', $userId);
             })
+            ->join('user_settings as settings', 'settings.user_id', '=', 'u.id')
             ->select([
                 'logged_user_chats.total_chats',
                 'logged_user_chats.chat_id as chat_id',
                 'u.id as user_id',
                 'u.name as user_name',
+                'settings.avatar_path',
             ]);
 
         $result = $query->get();
