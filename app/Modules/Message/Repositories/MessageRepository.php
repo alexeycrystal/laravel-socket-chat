@@ -6,6 +6,8 @@ namespace App\Modules\Message\Repositories;
 
 use App\Generics\Repositories\AbstractRepository;
 use App\Modules\Message\Models\Message;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -14,6 +16,39 @@ use Illuminate\Support\Facades\DB;
  */
 class MessageRepository extends AbstractRepository implements MessageRepositoryContract
 {
+    /**
+     * @param int $chatId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getMessages(int $chatId, array $params): ?Collection
+    {
+        $query = DB::table('messages as message')
+            ->join('user_settings as settings', function(Builder $query) use ($chatId) {
+                $query->on('settings.user_id', '=', 'message.user_id')
+                    ->where('message.chat_id', '=', $chatId);
+            })
+            ->select([
+                'message.id',
+                'message.user_id',
+                'message.text',
+                'message.created_at',
+                'message.updated_at',
+                'settings.avatar_path',
+            ])
+            ->selectRaw("count(message.id) over() as total_messages")
+            ->orderBy('message.created_at', 'desc')
+            ->take($params['take'])
+            ->skip($params['skip']);
+
+        $result = $query->get();
+
+        if($result && $result->isNotEmpty())
+            return $result;
+
+        return null;
+    }
+
     /**
      * @param array $payload
      * @return Message|null

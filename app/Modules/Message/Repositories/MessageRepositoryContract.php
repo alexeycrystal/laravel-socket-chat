@@ -5,6 +5,7 @@ namespace App\Modules\Message\Repositories;
 
 
 use App\Modules\Message\Models\Message;
+use Illuminate\Support\Collection;
 
 /**
  * Interface MessageRepositoryContract
@@ -12,6 +13,13 @@ use App\Modules\Message\Models\Message;
  */
 interface MessageRepositoryContract
 {
+    /**
+     * @param int $chatId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getMessages(int $chatId, array $params): ?Collection;
+
     /**
      * @param array $payload
      * @return Message|null

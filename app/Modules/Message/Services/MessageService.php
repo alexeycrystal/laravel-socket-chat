@@ -7,6 +7,7 @@ namespace App\Modules\Message\Services;
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\Message\Repositories\MessageRepositoryContract;
+use Illuminate\Support\Collection;
 
 /**
  * Class MessageService
@@ -33,6 +34,30 @@ class MessageService extends AbstractService implements MessageServiceContract
     {
         $this->authService = $authService;
         $this->messageRepository = $messageRepository;
+    }
+
+
+    /**
+     * @param int $chatId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getMessagesByChat(int $chatId, array $params): ?Collection
+    {
+        $payload = [
+            'take' => $params['per_page'],
+            'skip' => $params['page'] > 1
+                ? $params['per_page'] * $params['page']
+                : 0,
+        ];
+
+        $result = $this->messageRepository
+            ->getMessages($chatId, $payload);
+
+        if($result)
+            return $result;
+
+        return null;
     }
 
     /**

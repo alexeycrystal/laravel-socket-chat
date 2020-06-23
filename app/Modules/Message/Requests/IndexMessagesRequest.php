@@ -16,7 +16,7 @@ class IndexMessagesRequest extends JsonRequest
     {
         return [
             'chat_id' => [
-                'sometimes',
+                'required',
                 'integer',
                 new UserChatPermissionValidationRule($authService, $chatService),
             ],

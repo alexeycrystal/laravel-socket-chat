@@ -5,6 +5,7 @@ namespace App\Modules\Message\Services;
 
 
 use App\Generics\Services\AbstractServiceContract;
+use Illuminate\Support\Collection;
 
 /**
  * Interface MessageServiceContract
@@ -12,6 +13,13 @@ use App\Generics\Services\AbstractServiceContract;
  */
 interface MessageServiceContract extends AbstractServiceContract
 {
+    /**
+     * @param int $chatId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getMessagesByChat(int $chatId, array $params): ?Collection;
+
     /**
      * @param array $payload
      * @return int|null

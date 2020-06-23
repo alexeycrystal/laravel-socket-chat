@@ -25,11 +25,25 @@ class MessageController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param IndexMessagesRequest $request
+     * @return JsonResponse
      */
     public function index(IndexMessagesRequest $request)
     {
+        $payload = $request->validated();
 
+        $result = $this->messageService
+            ->getMessagesByChat($payload['chat_id'], $payload);
+
+        if(!$this->messageService->hasErrors())
+            return response()->json(
+                MessageTransformer::transformMessagesIndex($payload, $result), 200
+            );
+
+        if($this->messageService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the message creation process!'
+            ], 400);
     }
 
     /**

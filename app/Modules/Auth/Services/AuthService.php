@@ -4,7 +4,6 @@
 namespace App\Modules\Auth\Services;
 
 
-use App\Events\MessagePushed;
 use App\Facades\RepositoryManager;
 use App\GenericModels\User;
 use App\Generics\Services\AbstractService;
@@ -12,6 +11,7 @@ use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
 use App\Services\IP\LocationIPServiceContract;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
  * Class AuthService
@@ -82,12 +82,12 @@ class AuthService extends AbstractService implements AuthServiceContract
             return null;
         }
 
-        /**
-         * For tests
-         */
         //broadcast(new MessagePushed(1));
 
+        $user = JWTAuth::user();
+
         return [
+            'user_id' => $user->id,
             'token' => $token,
         ];
     }
@@ -156,8 +156,8 @@ class AuthService extends AbstractService implements AuthServiceContract
         }
 
         return [
-            'token' => $token,
             'user_id' => $user->id,
+            'token' => $token,
         ];
     }
 

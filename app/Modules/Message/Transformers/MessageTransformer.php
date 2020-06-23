@@ -5,6 +5,8 @@ namespace App\Modules\Message\Transformers;
 
 
 use App\Generics\Transformers\AbstractTransformer;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Class MessageTransformer
@@ -12,6 +14,57 @@ use App\Generics\Transformers\AbstractTransformer;
  */
 class MessageTransformer extends AbstractTransformer
 {
+    public static function transformMessagesIndex(array $payload, ?Collection $messages = null)
+    {
+        $result = [];
+
+        $totalMessages = 0;
+
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+
+        if($messages) {
+
+            $firstEntry = $messages->first();
+
+            $totalMessages = $firstEntry->total_messages;
+
+            foreach($messages as $message) {
+
+                $result[] = [
+                    'id' => $message->id,
+                    'user_id' => $message->user_id,
+                    'text' => $message->text,
+                    'avatar' => $message->avatar_path
+                        ? config('app.url') . $message->avatar_path
+                        : $defaultAvatarUrl,
+                    'created_at' => $message->created_at,
+                ];
+            }
+        }
+
+        $currentRouteName = Route::currentRouteName();
+
+        $meta = [
+            'total_messages' => $totalMessages,
+        ];
+
+        $links = self::preparePaginatedMeta(
+            $currentRouteName,
+            $payload['page'],
+            $totalMessages,
+            $payload['per_page'],
+        );
+
+        $links['meta'] = $meta;
+
+        return [
+            'data' => [
+                'messages' => $result,
+            ],
+            'links' => $links,
+        ];
+    }
+
     /**
      * @param int $messageId
      * @return array|array[]
