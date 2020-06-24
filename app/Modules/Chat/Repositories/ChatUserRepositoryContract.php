@@ -47,4 +47,11 @@ interface ChatUserRepositoryContract
      * @return bool|null
      */
     public function isUserExistsByChat(int $userId, int $chatId): ?bool;
+
+    /**
+     * @param int $chatId
+     * @param array|null $exceptUserIds
+     * @return array|null
+     */
+    public function getUserIdsByChat(int $chatId, ?array $exceptUserIds = null): ?array;
 }

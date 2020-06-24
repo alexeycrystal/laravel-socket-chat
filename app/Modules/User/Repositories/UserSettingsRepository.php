@@ -89,4 +89,22 @@ class UserSettingsRepository extends AbstractRepository implements UserSettingsR
 
         return null;
     }
+
+    /**
+     * @param int $userId
+     * @return string|null
+     */
+    public function getAvatarPathByUserId(int $userId): ?string
+    {
+        $query = DB::table('user_settings')
+            ->where('user_id', '=', $userId)
+            ->select(['avatar_path']);
+
+        $result = $query->value('avatar_path');
+
+        if($result)
+            return $result;
+
+        return null;
+    }
 }

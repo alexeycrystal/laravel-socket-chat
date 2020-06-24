@@ -5,6 +5,7 @@ namespace App\Modules\Message\Transformers;
 
 
 use App\Generics\Transformers\AbstractTransformer;
+use App\Modules\Message\Models\Message;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,7 @@ class MessageTransformer extends AbstractTransformer
                 $result[] = [
                     'id' => $message->id,
                     'user_id' => $message->user_id,
+                    'chat_id' => $message->chat_id,
                     'text' => $message->text,
                     'avatar' => $message->avatar_path
                         ? config('app.url') . $message->avatar_path
@@ -66,15 +68,24 @@ class MessageTransformer extends AbstractTransformer
     }
 
     /**
-     * @param int $messageId
+     * @param Message $message
      * @return array|array[]
      */
-    public static function transformMessageStore(int $messageId): array
+    public static function transformMessageStore(Message $message): array
     {
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+
         return [
             'data' => [
                 'result' => true,
-                'message_id' => $messageId,
+                'message' => [
+                    'id' => $message->id,
+                    'chat_id' => $message->chat_id,
+                    'user_id' => $message->user_id,
+                    'text' => $message->text,
+                    'created_at' => $message->created_at,
+                    'avatar' => $message->avatar ?? $defaultAvatarUrl,
+                ],
             ]
         ];
     }

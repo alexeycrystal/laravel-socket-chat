@@ -7,7 +7,7 @@
         "redis": {
             "host": "127.0.0.1",
             "port": 6379,
-            "db": 0,
+            "db": 1,
             "password": "gsJ9znJsjMzuW+qgI8ldozZeqscPrug5MZfsjk5GPQdSaf11JgdjQmPcHYtKlqlQhv5XCaMzMUo4ZvZu"
         },
         "sqlite": {

@@ -30,6 +30,7 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryC
             })
             ->select([
                 'message.id',
+                'message.chat_id',
                 'message.user_id',
                 'message.text',
                 'message.created_at',

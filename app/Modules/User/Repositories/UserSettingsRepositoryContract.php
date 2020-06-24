@@ -32,5 +32,16 @@ interface UserSettingsRepositoryContract
      */
     public function isNicknameAlreadyTaken(int $userId, string $nickname): ?bool;
 
+    /**
+     * @param int $userId
+     * @param array $payload
+     * @return bool|null
+     */
     public function update (int $userId, array $payload): ?bool;
+
+    /**
+     * @param int $userId
+     * @return string|null
+     */
+    public function getAvatarPathByUserId(int $userId): ?string;
 }

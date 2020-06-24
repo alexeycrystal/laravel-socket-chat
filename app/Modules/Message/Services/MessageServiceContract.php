@@ -5,6 +5,7 @@ namespace App\Modules\Message\Services;
 
 
 use App\Generics\Services\AbstractServiceContract;
+use App\Modules\Message\Models\Message;
 use Illuminate\Support\Collection;
 
 /**
@@ -22,9 +23,9 @@ interface MessageServiceContract extends AbstractServiceContract
 
     /**
      * @param array $payload
-     * @return int|null
+     * @return Message|null
      */
-    public function createByLoggedUser(array $payload): ?int;
+    public function createByLoggedUser(array $payload): ?Message;
 
     /**
      * @param int $userId

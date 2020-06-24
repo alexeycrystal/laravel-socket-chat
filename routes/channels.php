@@ -14,5 +14,8 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('chat.user.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+    if($user->id === (int) $userId)
+        return $user;
+    else
+        return false;
 });

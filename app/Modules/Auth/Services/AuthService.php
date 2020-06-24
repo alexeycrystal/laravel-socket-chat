@@ -82,8 +82,6 @@ class AuthService extends AbstractService implements AuthServiceContract
             return null;
         }
 
-        //broadcast(new MessagePushed(1));
-
         $user = JWTAuth::user();
 
         return [

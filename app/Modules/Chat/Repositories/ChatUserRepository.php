@@ -164,4 +164,28 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
 
         return null;
     }
+
+    /**
+     * @param int $chatId
+     * @param array|null $exceptUserIds
+     * @return array|null
+     */
+    public function getUserIdsByChat(int $chatId, ?array $exceptUserIds = null): ?array
+    {
+        $query = DB::table('chat_user')
+            ->where('chat_id', '=', $chatId)
+            ->select([
+                'user_id'
+            ]);
+
+        if($exceptUserIds)
+            $query->whereNotIn('user_id', $exceptUserIds);
+
+        $result = $query->get();
+
+        if($result && $result->isNotEmpty())
+            return $result->pluck('user_id')->values()->toArray();
+
+        return null;
+    }
 }

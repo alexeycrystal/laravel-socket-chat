@@ -6,7 +6,12 @@ namespace App\Modules\Message\Services;
 
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
+use App\Modules\Message\Events\ChatMessageSentEvent;
+use App\Modules\Message\Models\Message;
 use App\Modules\Message\Repositories\MessageRepositoryContract;
+use App\Modules\Message\Transformers\MessageTransformer;
+use App\Modules\User\Repositories\UserSettingsRepositoryContract;
 use Illuminate\Support\Collection;
 
 /**
@@ -23,19 +28,32 @@ class MessageService extends AbstractService implements MessageServiceContract
      * @var MessageRepositoryContract
      */
     protected MessageRepositoryContract $messageRepository;
+    /**
+     * @var UserSettingsRepositoryContract
+     */
+    protected UserSettingsRepositoryContract $userSettingsRepository;
+    /**
+     * @var ChatUserRepositoryContract
+     */
+    protected ChatUserRepositoryContract $chatUserRepository;
 
     /**
      * MessageService constructor.
      * @param AuthServiceContract $authService
      * @param MessageRepositoryContract $messageRepository
+     * @param UserSettingsRepositoryContract $userSettingsRepository
+     * @param ChatUserRepositoryContract $chatUserRepository
      */
     public function __construct(AuthServiceContract $authService,
-                                MessageRepositoryContract $messageRepository)
+                                MessageRepositoryContract $messageRepository,
+                                UserSettingsRepositoryContract $userSettingsRepository,
+                                ChatUserRepositoryContract $chatUserRepository)
     {
         $this->authService = $authService;
         $this->messageRepository = $messageRepository;
+        $this->userSettingsRepository = $userSettingsRepository;
+        $this->chatUserRepository = $chatUserRepository;
     }
-
 
     /**
      * @param int $chatId
@@ -62,23 +80,41 @@ class MessageService extends AbstractService implements MessageServiceContract
 
     /**
      * @param array $payload
-     * @return int|null
+     * @return Message|null
      */
-    public function createByLoggedUser(array $payload): ?int
+    public function createByLoggedUser(array $payload): ?Message
     {
         $user = $this->authService->getLoggedUser();
 
+        $chatId = $payload['chat_id'];
+
         $data = [
             'user_id' => $user->id,
-            'chat_id' => $payload['chat_id'],
+            'chat_id' => $chatId,
             'text' => $payload['text'],
         ];
 
         $message = $this->messageRepository
             ->create($data);
 
-        if($message)
-            return $message->id;
+        if($message) {
+
+            $message->avatar = $this->userSettingsRepository
+                ->getAvatarPathByUserId($user->id);
+
+            $userIdsByChat = $this->chatUserRepository
+                ->getUserIdsByChat($chatId, [$user->id]);
+
+            broadcast(
+                new ChatMessageSentEvent(
+                    'chat.user',
+                    $userIdsByChat,
+                    MessageTransformer::transformMessageStore($message)
+                )
+            );
+
+            return $message;
+        }
 
         $this->addError(
             504,
