@@ -45,6 +45,7 @@ class UserSettingsRepository extends AbstractRepository implements UserSettingsR
                 'profile.timezone',
                 'profile.phone',
                 'profile.lang',
+                'profile.avatar_path',
             ]);
 
         $result = $query->first();

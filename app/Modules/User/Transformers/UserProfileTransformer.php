@@ -9,6 +9,8 @@ class UserProfileTransformer
 {
     public static function transform(\stdClass $userSettings): array
     {
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+
         return [
             'data' => [
                 'name' => $userSettings->name,
@@ -16,6 +18,7 @@ class UserProfileTransformer
                 'timezone' => $userSettings->timezone,
                 'phone' => $userSettings->phone ?? '',
                 'lang' => $userSettings->lang,
+                'avatar' => $userSettings->avatar_path ?? $defaultAvatarUrl,
             ],
         ];
     }
