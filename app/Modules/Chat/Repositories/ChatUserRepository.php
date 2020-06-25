@@ -139,6 +139,9 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
                 'settings.avatar_path',
             ]);
 
+        echo $this->getSqlWithBindings($query);
+        die();
+
         $result = $query->get();
 
         if($result && $result->isNotEmpty())

@@ -62,4 +62,9 @@ Route::group([
     Route::apiResources(
         ['messages' => 'App\Modules\Message\Controllers\MessageController']
     );
+
+    Route::apiResources(
+        ['ws/dependencies' => 'App\Modules\Realtime\Controllers\UserRealtimeDependencyController'],
+        ['only' => ['store', 'destroy']]
+    );
 });

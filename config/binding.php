@@ -19,6 +19,8 @@ return [
 
     \App\Modules\Message\Repositories\MessageRepositoryContract::class => \App\Modules\Message\Repositories\MessageRepository::class,
 
+    \App\Modules\Realtime\Repositories\UserRealtimeDependencyRepositoryContract::class => \App\Modules\Realtime\Repositories\UserRealtimeDependencyRedisRepository::class,
+
     /**
      * Services
      */
@@ -32,4 +34,6 @@ return [
     \App\Modules\Auth\Services\JWTServiceContract::class => \App\Modules\Auth\Services\JWTService::class,
 
     \App\Services\IP\LocationIPServiceContract::class => \App\Services\IP\LocationIPService::class,
+
+    \App\Modules\Realtime\Services\UserRealtimeDependencyServiceContract::class => \App\Modules\Realtime\Services\UserRealtimeDependencyService::class,
 ];

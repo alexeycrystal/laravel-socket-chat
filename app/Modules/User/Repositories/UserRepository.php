@@ -59,4 +59,23 @@ class UserRepository extends AbstractRepository implements UserRepositoryContrac
 
         return null;
     }
+
+    /**
+     * @param array $userIds
+     * @return bool|null
+     */
+    public function isUsersListExisted(array $userIds): ?bool
+    {
+        $query = DB::table('users')
+            ->whereIn('id', $userIds)
+            ->selectRaw('count(id) over() as total_count')
+            ->limit(1);
+
+        $result = $query->value('total_count');
+
+        if($result)
+            return $result === count($userIds);
+
+        return null;
+    }
 }

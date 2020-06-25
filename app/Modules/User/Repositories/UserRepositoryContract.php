@@ -30,4 +30,10 @@ interface UserRepositoryContract
      * @return bool|null
      */
     public function update(int $userId, array $payload): ?bool;
+
+    /**
+     * @param array $userIds
+     * @return bool|null
+     */
+    public function isUsersListExisted(array $userIds): ?bool;
 }
