@@ -22,16 +22,6 @@ class UserRealtimeDependencyController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param StoreUserRealtimeDependencyRequest $request
@@ -42,7 +32,7 @@ class UserRealtimeDependencyController extends Controller
         $payload = $request->validated();
 
         $result = $this->userRealtimeDependencyService
-            ->create($payload['users_ids']);
+            ->addLoggedUserAsListener($payload['chats_ids']);
 
         if (!isset($result)
             || $this->userRealtimeDependencyService->hasErrors())
@@ -51,31 +41,8 @@ class UserRealtimeDependencyController extends Controller
             ], 400);
 
         return response()->json(
-            UserRealtimeDependencyTransformer::transformStoreResult($result), 200
+            UserRealtimeDependencyTransformer::transformStoreResult($result), 201
         );
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**

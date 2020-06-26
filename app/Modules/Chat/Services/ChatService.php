@@ -10,6 +10,7 @@ use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\Chat\Models\Chat;
 use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
+use App\Modules\User\Repositories\UserCacheRepositoryContract;
 use App\Modules\User\Services\UserContactsServiceContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -37,29 +38,34 @@ class ChatService extends AbstractService implements ChatServiceContract
      */
     protected UserContactsServiceContract $userContactsService;
 
+    protected UserCacheRepositoryContract $userCacheRepository;
+
     /**
      * ChatService constructor.
      * @param AuthServiceContract $authService
      * @param ChatRepositoryContract $chatRepository
      * @param ChatUserRepositoryContract $chatUserRepository
      * @param UserContactsServiceContract $userContactsService
+     * @param UserCacheRepositoryContract $userCacheRepository
      */
     public function __construct(AuthServiceContract $authService,
                                 ChatRepositoryContract $chatRepository,
                                 ChatUserRepositoryContract $chatUserRepository,
-                                UserContactsServiceContract $userContactsService)
+                                UserContactsServiceContract $userContactsService,
+                                UserCacheRepositoryContract $userCacheRepository)
     {
         $this->authService = $authService;
         $this->chatRepository = $chatRepository;
         $this->chatUserRepository = $chatUserRepository;
         $this->userContactsService = $userContactsService;
+        $this->userCacheRepository = $userCacheRepository;
     }
 
     /**
      * @param array $params
-     * @return Collection|null
+     * @return array|null
      */
-    public function getChats(array $params): ?Collection
+    public function getChats(array $params): ?array
     {
         $user = $this->authService->getLoggedUser();
 
@@ -73,8 +79,21 @@ class ChatService extends AbstractService implements ChatServiceContract
         $result = $this->chatUserRepository
             ->getAvailableChatsByUser($user->id, $params);
 
-        if($result)
-            return $result;
+        if($result) {
+
+            $userIds = $result->pluck('user_id')
+                ->values()
+                ->toArray();
+
+            $statuses = $this->userCacheRepository
+                ->getStatusesByUserIds($userIds);
+
+            return [
+                'result' => $result,
+                'statuses' => $statuses,
+                'users_ids' => $userIds,
+            ];
+        }
 
         return null;
     }
@@ -228,6 +247,27 @@ class ChatService extends AbstractService implements ChatServiceContract
         $this->addError(
             504,
             'ChatService@isUserExistsByChat',
+            'Some serious error occurs during the chat user validation process.'
+        );
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $chatIDs
+     * @return bool|null
+     */
+    public function isUserHasAccessToChats(int $userId, array $chatIDs): ?bool
+    {
+        $result = $this->chatUserRepository
+            ->isUserHasAccessToChats($userId, $chatIDs);
+
+        if(isset($result))
+            return $result;
+
+        $this->addError(
+            504,
+            'ChatService@isUserHasAccessToChats',
             'Some serious error occurs during the chat user validation process.'
         );
         return null;

@@ -43,6 +43,8 @@ Route::group([
 
     Route::get('password/change', 'UserProfileController@updatePassword');
 
+    Route::post('status/change', 'UserProfileController@updateUserStatus')
+        ->middleware('post.broadcast');
 });
 
 Route::group([

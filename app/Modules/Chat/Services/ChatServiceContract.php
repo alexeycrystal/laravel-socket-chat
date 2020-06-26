@@ -16,9 +16,9 @@ interface ChatServiceContract extends AbstractServiceContract
 {
     /**
      * @param array $params
-     * @return Collection|null
+     * @return array|null
      */
-    public function getChats(array $params): ?Collection;
+    public function getChats(array $params): ?array;
 
     /**
      * @param array $usersIds
@@ -52,4 +52,11 @@ interface ChatServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function isUserExistsByChat(int $userId, int $chatId): ?bool;
+
+    /**
+     * @param int $userId
+     * @param array $chatIDs
+     * @return bool|null
+     */
+    public function isUserHasAccessToChats(int $userId, array $chatIDs): ?bool;
 }

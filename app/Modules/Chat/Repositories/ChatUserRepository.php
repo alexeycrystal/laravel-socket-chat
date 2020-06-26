@@ -139,9 +139,6 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
                 'settings.avatar_path',
             ]);
 
-        echo $this->getSqlWithBindings($query);
-        die();
-
         $result = $query->get();
 
         if($result && $result->isNotEmpty())
@@ -188,6 +185,47 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
 
         if($result && $result->isNotEmpty())
             return $result->pluck('user_id')->values()->toArray();
+
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $chatIds
+     * @return bool|null
+     */
+    public function isUserHasAccessToChats(int $userId, array $chatIds): ?bool
+    {
+        $query = DB::table('chat_user')
+            ->where('user_id', '=', $userId)
+            ->whereIn('chat_id', $chatIds);
+
+        $result = $query->count('chat_id');
+
+        if($result)
+            return $result === count($chatIds);
+
+        return null;
+    }
+
+    /**
+     * @param array $chatIds
+     * @param array|null $exceptUserIds
+     * @return Collection|null
+     */
+    public function getAllUsersByChats(array $chatIds, ?array $exceptUserIds = null): ?Collection
+    {
+        $query = DB::table('chat_user')
+            ->whereIn('chat_id',$chatIds)
+            ->selectRaw('distinct on (user_id) user_id');
+
+        if($exceptUserIds)
+            $query = $query->whereNotIn('user_id', $exceptUserIds);
+
+        $result = $query->get();
+
+        if($result && $result->isNotEmpty())
+            return $result;
 
         return null;
     }

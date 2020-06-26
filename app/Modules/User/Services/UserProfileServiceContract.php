@@ -36,4 +36,10 @@ interface UserProfileServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function isNicknameAlreadyTaken(int $userId, string $nickname): ?bool;
+
+    /**
+     * @param string $status
+     * @return bool|null
+     */
+    public function changeLoggedUserStatus(string $status): ?bool;
 }

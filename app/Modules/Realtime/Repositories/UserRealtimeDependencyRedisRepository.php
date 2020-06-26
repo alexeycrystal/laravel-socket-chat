@@ -28,7 +28,7 @@ class UserRealtimeDependencyRedisRepository extends AbstractRepository implement
 
         $result = Redis::sInter($keyPath);
 
-        if($result)
+        if ($result)
             return $result;
 
         return null;
@@ -41,17 +41,15 @@ class UserRealtimeDependencyRedisRepository extends AbstractRepository implement
      */
     public function storeUsersIdsToListen(int $userId, array $dependencyUsersIds): ?bool
     {
-        $result = Redis::pipeline(function ($pipe) use ($userId, $dependencyUsersIds) {
+        $params = [];
+        $path = $this->corePath . ':listen';
 
-            foreach ($dependencyUsersIds as $dependencyUserId) {
+        foreach ($dependencyUsersIds as $dependencyUserId)
+            $params[$userId . ':' . $dependencyUserId] = $dependencyUserId;
 
-                $path = $this->corePath . ':listen:' . $dependencyUserId;
+        $result = Redis::zAdd($path, $params);
 
-                $pipe->zAdd($path, $userId . ':' . $dependencyUserId);
-            }
-        });
-
-        if($result)
+        if ($result)
             return true;
 
         return false;
@@ -66,10 +64,10 @@ class UserRealtimeDependencyRedisRepository extends AbstractRepository implement
         $key = $this->corePath . ':listen';
 
         $result = Redis::rawCommand(
-            'zRemRangeByLex', $key, '[' . $userId , '[' . $userId
+            'zRemRangeByLex', $key, '[' . $userId, '[' . $userId
         );
 
-        if($result)
+        if ($result)
             return true;
 
         return false;
@@ -84,10 +82,16 @@ class UserRealtimeDependencyRedisRepository extends AbstractRepository implement
     {
         $key = $this->corePath . ':listen';
 
-        $result = Redis::zRangeByScore($key, $userId, $userId);
+        $values = Redis::zRangeByScore($key, $userId, $userId);
 
-        if($result)
+        if ($values) {
+
+            $result = [];
+            foreach($values as $value)
+                $result[] = intval(explode(':', $value)[0]);
+
             return $result;
+        }
 
         return null;
     }

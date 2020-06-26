@@ -5,9 +5,7 @@ namespace App\Modules\Chat\Transformers;
 
 
 use App\Generics\Transformers\AbstractTransformer;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ChatTransformer
@@ -17,11 +15,11 @@ class ChatTransformer extends AbstractTransformer
 {
     /**
      * @param array $payload
-     * @param Collection|null $data
+     * @param array|null $data
      * @return array
      */
     public static function transformChatIndex(array $payload,
-                                              ?Collection $data = null): array
+                                              ?array $data = null): array
     {
         $result = [];
 
@@ -31,6 +29,15 @@ class ChatTransformer extends AbstractTransformer
         $defaultGroupAvatar = config('app.url') . '/storage/avatars/default/default_group_avatar.png';
 
         if($data) {
+
+            $statuses = $data['statuses'];
+            $usersIds = $data['users_ids'];
+
+            $statusResult = [];
+            foreach($usersIds as $index => $userId)
+                $statusResult[$userId] = $statuses[$index] ?? '';
+
+            $data = $data['result'];
 
             $totalChatCount = $data->first()->total_chats;
 
@@ -53,18 +60,28 @@ class ChatTransformer extends AbstractTransformer
 
                     $avatar = $defaultGroupAvatar;
 
+                    $status = '';
+
+                    $userId = null;
+
                 } else {
 
                     $chatTitle = $firstRow->user_name;
                     $avatar = $firstRow->avatar_path
                         ? config('app.url') . $firstRow->avatar_path
                         : $defaultAvatarUrl;
+
+                    $status = $statusResult[$firstRow->user_id];
+
+                    $userId = $firstRow->user_id;
                 }
 
                 $entry = [
                     'chat_id' => $firstRow->chat_id,
+                    'user_id' => $userId,
                     'title' => $chatTitle,
                     'avatar' => $avatar,
+                    'status' => $status,
                 ];
 
                 $result[] = $entry;

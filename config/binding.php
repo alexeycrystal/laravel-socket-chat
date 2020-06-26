@@ -10,6 +10,7 @@ return [
 
     \App\Modules\User\Services\UserProfileServiceContract::class => \App\Modules\User\Services\UserProfileService::class,
     \App\Modules\User\Repositories\UserContactsRepositoryContract::class => \App\Modules\User\Repositories\UserContactRepository::class,
+    \App\Modules\User\Repositories\UserCacheRepositoryContract::class => \App\Modules\User\Repositories\UserCacheRepository::class,
 
     /*
      * Chat

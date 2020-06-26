@@ -54,4 +54,18 @@ interface ChatUserRepositoryContract
      * @return array|null
      */
     public function getUserIdsByChat(int $chatId, ?array $exceptUserIds = null): ?array;
+
+    /**
+     * @param int $userId
+     * @param array $chatIds
+     * @return bool|null
+     */
+    public function isUserHasAccessToChats(int $userId, array $chatIds): ?bool;
+
+    /**
+     * @param array $chatIds
+     * @param array|null $exceptUserIds
+     * @return Collection|null
+     */
+    public function getAllUsersByChats(array $chatIds, ?array $exceptUserIds = null): ?Collection;
 }

@@ -11,10 +11,10 @@ namespace App\Modules\Realtime\Services;
 interface UserRealtimeDependencyServiceContract
 {
     /**
-     * @param array $usersIds
+     * @param array $chatsIds
      * @return bool|null
      */
-    public function addLoggedUserAsListener(array $usersIds): ?bool;
+    public function addLoggedUserAsListener(array $chatsIds): ?bool;
 
     /**
      * @return bool|null

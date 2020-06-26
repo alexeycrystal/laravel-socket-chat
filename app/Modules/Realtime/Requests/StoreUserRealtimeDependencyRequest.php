@@ -5,19 +5,21 @@ namespace App\Modules\Realtime\Requests;
 
 
 use App\Generics\Requests\JsonRequest;
-use App\Modules\Realtime\Rules\UserExistedByListRule;
-use App\Modules\User\Repositories\UserRepositoryContract;
+use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Chat\Services\ChatServiceContract;
+use App\Modules\Realtime\Rules\UserHasAccessToChatsRule;
 
 class StoreUserRealtimeDependencyRequest extends JsonRequest
 {
-    public function rules(UserRepositoryContract $userRepository)
+    public function rules(AuthServiceContract $authService,
+                          ChatServiceContract $chatService)
     {
         return [
-            'users_ids' => [
+            'chats_ids' => [
                 'required',
                 'array',
                 'min:1',
-                new UserExistedByListRule($userRepository)
+                new UserHasAccessToChatsRule($authService, $chatService)
             ],
         ];
     }

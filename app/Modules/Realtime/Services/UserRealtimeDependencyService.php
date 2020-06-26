@@ -6,6 +6,7 @@ namespace App\Modules\Realtime\Services;
 
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
 use App\Modules\Realtime\Repositories\UserRealtimeDependencyRepositoryContract;
 
 /**
@@ -23,33 +24,52 @@ class UserRealtimeDependencyService extends AbstractService implements UserRealt
      */
     protected UserRealtimeDependencyRepositoryContract $realtimeDependencyRepository;
 
+    protected ChatUserRepositoryContract $chatUserRepository;
+
     /**
      * UserRealtimeDependencyService constructor.
      * @param AuthServiceContract $authService
      * @param UserRealtimeDependencyRepositoryContract $realtimeDependencyRepository
+     * @param ChatUserRepositoryContract $chatUserRepository
      */
     public function __construct(AuthServiceContract $authService,
-                                UserRealtimeDependencyRepositoryContract $realtimeDependencyRepository)
+                                UserRealtimeDependencyRepositoryContract $realtimeDependencyRepository,
+                                ChatUserRepositoryContract $chatUserRepository)
     {
         $this->authService = $authService;
         $this->realtimeDependencyRepository = $realtimeDependencyRepository;
+        $this->chatUserRepository = $chatUserRepository;
     }
 
     /**
-     * @param array $usersIds
+     * @param array $chatsIds
      * @return bool|null
      */
-    public function addLoggedUserAsListener(array $usersIds): ?bool
+    public function addLoggedUserAsListener(array $chatsIds): ?bool
     {
         $user = $this->authService->getLoggedUser();
 
-        $created = $this->realtimeDependencyRepository
-            ->storeUsersIdsToListen($user->id, $usersIds);
+        $userIds = $this->chatUserRepository
+            ->getAllUsersByChats($chatsIds, [$user->id]);
 
-        if($created)
+        if($userIds) {
+
+            $userIds = $userIds->pluck('user_id')
+                ->values()
+                ->toArray();
+
+            $created = $this->realtimeDependencyRepository
+                ->storeUsersIdsToListen($user->id, $userIds);
+
             return true;
+        }
 
-        return false;
+        $this->addError(
+            504,
+            'UserRealtimeDependencyService@addLoggedUserAsListener',
+            'Some serious error occurs during the ws-listeners save process.'
+        );
+        return null;
     }
 
     /**
@@ -65,6 +85,11 @@ class UserRealtimeDependencyService extends AbstractService implements UserRealt
         if(isset($result))
             return $result;
 
+        $this->addError(
+            504,
+            'UserRealtimeDependencyService@removeLoggedUserFromListeners',
+            'Some serious error occurs during the user-ws-listeners delete process.'
+        );
         return null;
     }
 }

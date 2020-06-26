@@ -7,8 +7,12 @@ namespace App\Modules\User\Services;
 use App\Facades\RepositoryManager;
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Realtime\Events\UserStatusChangedEvent;
+use App\Modules\Realtime\Repositories\UserRealtimeDependencyRepositoryContract;
+use App\Modules\User\Repositories\UserCacheRepositoryContract;
 use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
+use App\Traits\Broadcast\PostProcessingBroadcaster;
 use Illuminate\Support\Facades\Hash;
 use stdClass;
 
@@ -18,6 +22,8 @@ use stdClass;
  */
 class UserProfileService extends AbstractService implements UserProfileServiceContract
 {
+    use PostProcessingBroadcaster;
+
     /**
      * @var AuthServiceContract
      */
@@ -30,20 +36,32 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
      * @var UserRepositoryContract
      */
     protected UserRepositoryContract $userRepository;
+    /**
+     * @var UserCacheRepositoryContract
+     */
+    protected UserCacheRepositoryContract $userCacheRepository;
+
+    protected UserRealtimeDependencyRepositoryContract $userRealtimeDependencyRepository;
 
     /**
      * UserProfileService constructor.
      * @param AuthServiceContract $authService
      * @param UserSettingsRepositoryContract $userSettingsRepository
      * @param UserRepositoryContract $userRepository
+     * @param UserCacheRepositoryContract $userCacheRepository
+     * @param UserRealtimeDependencyRepositoryContract $userRealtimeDependencyRepository
      */
     public function __construct(AuthServiceContract $authService,
                                 UserSettingsRepositoryContract $userSettingsRepository,
-                                UserRepositoryContract $userRepository)
+                                UserRepositoryContract $userRepository,
+                                UserCacheRepositoryContract $userCacheRepository,
+                                UserRealtimeDependencyRepositoryContract $userRealtimeDependencyRepository)
     {
         $this->authService = $authService;
         $this->userSettingsRepository = $userSettingsRepository;
         $this->userRepository = $userRepository;
+        $this->userCacheRepository = $userCacheRepository;
+        $this->userRealtimeDependencyRepository = $userRealtimeDependencyRepository;
     }
 
     /**
@@ -160,5 +178,33 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
         );
 
         return null;
+    }
+
+    /**
+     * @param string $status
+     * @return bool|null
+     */
+    public function changeLoggedUserStatus(string $status): ?bool
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $result = $this->userCacheRepository
+            ->updateStatus($user->id, $status);
+
+        if($result) {
+
+            $listenersUsersIds = $this->userRealtimeDependencyRepository
+                ->getAllListenersByUser($user->id);
+
+            $this->preparePostBroadcastData(
+                'UserStatusChangedEvent',
+                'chat.user', $user->id,
+                ['data' => ['user_id' => $user->id, 'status' => $status]]
+            );
+
+            return true;
+        }
+
+        return false;
     }
 }
