@@ -65,7 +65,7 @@ class MessageService extends AbstractService implements MessageServiceContract
         $payload = [
             'take' => $params['per_page'],
             'skip' => $params['page'] > 1
-                ? $params['per_page'] * $params['page']
+                ? $params['per_page'] * ($params['page'] - 1)
                 : 0,
         ];
 
