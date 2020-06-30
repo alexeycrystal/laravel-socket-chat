@@ -80,6 +80,7 @@ class ChatTransformer extends AbstractTransformer
                     'chat_id' => $firstRow->chat_id,
                     'user_id' => $userId,
                     'title' => $chatTitle,
+                    'last_message' => $firstRow->last_message_thumb,
                     'avatar' => $avatar,
                     'status' => $status,
                 ];

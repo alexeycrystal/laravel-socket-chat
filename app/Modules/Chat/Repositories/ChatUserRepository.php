@@ -131,13 +131,25 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
                     ->where('u.id', '!=', $userId);
             })
             ->join('user_settings as settings', 'settings.user_id', '=', 'u.id')
+            ->leftJoin('messages', function(Builder $query) {
+
+                $query->on('messages.chat_id', '=', 'logged_user_chats.chat_id')
+                    ->where('messages.id', function(Builder $query) {
+                        $query->select(['id'])
+                            ->from('messages')
+                            ->whereRaw('"messages".chat_id = "logged_user_chats".chat_id')
+                            ->orderBy('messages.id', 'desc')
+                            ->limit(1);
+                    });
+            })
             ->select([
                 'logged_user_chats.total_chats',
                 'logged_user_chats.chat_id as chat_id',
                 'u.id as user_id',
                 'u.name as user_name',
                 'settings.avatar_path',
-            ]);
+            ])
+            ->selectRaw('substring(messages.text from 0 for 100) as last_message_thumb');
 
         $result = $query->get();
 
