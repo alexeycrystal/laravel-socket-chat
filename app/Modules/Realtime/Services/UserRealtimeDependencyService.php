@@ -8,6 +8,7 @@ use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
 use App\Modules\Realtime\Repositories\UserRealtimeDependencyRepositoryContract;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class UserRealtimeDependencyService

@@ -71,5 +71,6 @@ class Kernel extends HttpKernel
         'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
         'jwt.validate' => \App\Http\Middleware\Auth\JWTTokenCheck::class,
         'post.broadcast' => \App\Http\Middleware\Broadcast\PostProcessingBroadcastMiddleware::class,
+        'navigator.beacon' => \App\Http\Middleware\Beacon\NavigatorBeaconCheck::class,
     ];
 }

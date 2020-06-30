@@ -19,7 +19,8 @@
         "staudenmeir/laravel-cte": "^1.0",
         "stevebauman/location": "^5.0",
         "tymon/jwt-auth": "^1.0",
-        "ext-redis": "*"
+        "ext-redis": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

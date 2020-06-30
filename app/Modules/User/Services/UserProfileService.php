@@ -193,9 +193,6 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
 
         if($result) {
 
-            $listenersUsersIds = $this->userRealtimeDependencyRepository
-                ->getAllListenersByUser($user->id);
-
             $this->preparePostBroadcastData(
                 'UserStatusChangedEvent',
                 'chat.user', $user->id,

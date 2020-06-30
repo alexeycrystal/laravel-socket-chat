@@ -30,8 +30,6 @@ class PostProcessingBroadcastMiddleware
 
     public function terminate($request, $response)
     {
-        Log::debug('Trying to process: ' . json_encode(isset($request->postprocessing_broadcast_data)));
-
         if(isset($request->postprocessing_broadcast_data)) {
 
             $data = $request->postprocessing_broadcast_data;
@@ -43,8 +41,6 @@ class PostProcessingBroadcastMiddleware
 
             $listenersUsersIds = $this->userRealtimeDependencyRepository
                 ->getAllListenersByUser($userId);
-
-            Log::debug('Listeners found: ' . json_encode([$channelName, $listenersUsersIds, $dataToPush]));
 
             if(!empty($listenersUsersIds)) {
 

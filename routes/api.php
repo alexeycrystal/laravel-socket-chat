@@ -33,40 +33,55 @@ Route::group([
 
 Route::group([
     'prefix' => 'profile',
-    'middleware' => ['jwt.validate'],
     'namespace' => 'App\Modules\User\Controllers'
 ], function() {
 
-    Route::get('settings/get', 'UserProfileController@getProfileByLoggedUser');
+    Route::group(['middleware' => ['jwt.validate']], function() {
 
-    Route::post('settings/update', 'UserProfileController@updateProfileSettings');
+        Route::get('settings/get', 'UserProfileController@getProfileByLoggedUser');
 
-    Route::get('password/change', 'UserProfileController@updatePassword');
+        Route::post('settings/update', 'UserProfileController@updateProfileSettings');
+
+        Route::get('password/change', 'UserProfileController@updatePassword');
+
+    });
 
     Route::post('status/change', 'UserProfileController@updateUserStatus')
-        ->middleware('post.broadcast');
+        ->middleware(['navigator.beacon', 'jwt.validate', 'post.broadcast']);
 });
 
 Route::group([
     'prefix' => 'user',
-    'middleware' => 'jwt.validate',
 ], function() {
 
-    Route::apiResources(
-        ['chats' => 'App\Modules\Chat\Controllers\ChatController'],
-        ['except' => ['update']]
-    );
+    Route::group([
+        'middleware' => 'jwt.validate'
+    ], function() {
 
-    Route::apiResources(
-        ['contacts' => 'App\Modules\User\Controllers\UserContactController']
-    );
+        Route::apiResources(
+            ['chats' => 'App\Modules\Chat\Controllers\ChatController'],
+            ['except' => ['update']]
+        );
 
-    Route::apiResources(
-        ['messages' => 'App\Modules\Message\Controllers\MessageController']
-    );
+        Route::apiResources(
+            ['contacts' => 'App\Modules\User\Controllers\UserContactController']
+        );
 
-    Route::apiResources(
-        ['ws/dependencies' => 'App\Modules\Realtime\Controllers\UserRealtimeDependencyController'],
-        ['only' => ['store', 'destroy']]
-    );
+        Route::apiResources(
+            ['messages' => 'App\Modules\Message\Controllers\MessageController']
+        );
+    });
+
+    Route::post('ws/dependencies', 'App\Modules\Realtime\Controllers\UserRealtimeDependencyController@store')
+        ->middleware('jwt.validate');
+    Route::post('ws/dependencies/destroy', 'App\Modules\Realtime\Controllers\UserRealtimeDependencyController@destroy')
+        ->middleware(['navigator.beacon', 'jwt.validate']);
+});
+
+Route::group([
+    'prefix' => 'proxy',
+    'namespace' => 'App\Modules\BeaconProxy\Controllers'
+], function() {
+
+    Route::post('beacon', 'BeaconProxyController@processRequest');
 });

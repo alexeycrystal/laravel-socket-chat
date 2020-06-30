@@ -63,15 +63,31 @@ class UserRealtimeDependencyRedisRepository extends AbstractRepository implement
     {
         $key = $this->corePath . ':listen';
 
-        $result = Redis::rawCommand(
-            'zRemRangeByLex', $key, '[' . $userId, '[' . $userId
-        );
+        $pattern = "{$userId}:*";
 
-        if ($result)
-            return true;
+        $result = Redis::command("zscan", [$key, '0', "$pattern" ]);
 
-        return false;
+        if($result && !empty($result)) {
 
+            $args = [$key];
+
+            $keys = array_keys($result);
+
+            $args = array_merge($args, $keys);
+
+            $result = Redis::command('zRem', $args);
+
+            if(!$result)
+                $this->addError(
+                    500,
+                    'UserRealtimeDependencyRedisRepository@removeListenerFromGroups',
+                    'Some issue happens in Redis during listeners deletion.'
+                );
+
+            return $result;
+        }
+
+        return true;
     }
 
     /**

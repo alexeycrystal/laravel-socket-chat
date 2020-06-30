@@ -41,7 +41,7 @@ abstract class AbstractRepository
                              string $level,
                              string $message): bool
     {
-        if(!$this->errors)
+        if(!isset($this->errors))
             $this->errors = new Collection();
 
         $this->errors->push(['code'=> $code,'level'=> $level, 'message' => $message]);

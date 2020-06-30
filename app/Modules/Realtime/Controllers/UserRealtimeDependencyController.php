@@ -49,9 +49,9 @@ class UserRealtimeDependencyController extends Controller
      * Remove the specified resource from storage.
      *
      * @param DestroyUserDependencyRequest $request
-     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy(DestroyUserDependencyRequest $request, $id)
+    public function destroy(DestroyUserDependencyRequest $request)
     {
         $result = $this->userRealtimeDependencyService
             ->removeLoggedUserFromListeners();
