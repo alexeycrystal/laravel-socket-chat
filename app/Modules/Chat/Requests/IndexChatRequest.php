@@ -20,6 +20,11 @@ class IndexChatRequest extends JsonRequest
                 'required',
                 'integer',
                 'min:1'
+            ],
+            'filter' => [
+                'sometimes',
+                'string',
+                'min:1',
             ]
         ];
     }

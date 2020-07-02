@@ -104,23 +104,7 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
      */
     public function getAvailableChatsByUser(int $userId, array $params): ?Collection
     {
-        $take = $params['take'];
-        $skip = $params['skip'];
-
-        $withQuery = DB::table('chats')
-            ->join('chat_user', function(Builder $query) use ($userId) {
-
-                $query->on('chats.id', '=', 'chat_user.chat_id')
-                    ->where('chat_user.user_id', '=', $userId)
-                    ->whereRaw('chat_user.is_visible is true');
-            })
-            ->select([
-                'chat_id'
-            ])
-            ->selectRaw("count(\"chats\".\"id\") over() as total_chats")
-            ->orderBy('chats.updated_at', 'desc')
-            ->take($take)
-            ->skip($skip);
+        $withQuery = $this->getAvailableChatsByUserQuery($userId, $params);
 
         $query = DB::table('logged_user_chats')
             ->withExpression('logged_user_chats', $withQuery)
@@ -157,6 +141,110 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
             return $result;
 
         return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getAvailableChatsByFilter(int $userId, array $params): ?Collection
+    {
+        $withQuery = $this->getChatsByFilteredMessages($userId, $params);
+
+        $query = DB::table('logged_user_chats')
+            ->withExpression('logged_user_chats', $withQuery)
+            ->join('chat_user', 'chat_user.chat_id', '=', 'logged_user_chats.chat_id')
+            ->join('users as u', function(Builder $query) use ($userId) {
+
+                $query->on('u.id', '=', 'chat_user.user_id')
+                    ->where('u.id', '!=', $userId);
+            })
+            ->join('user_settings as settings', 'settings.user_id', '=', 'u.id')
+
+            ->select([
+                'logged_user_chats.total_chats',
+                'logged_user_chats.chat_id as chat_id',
+                'logged_user_chats.message_id as message_id',
+                'u.id as user_id',
+                'u.name as user_name',
+                'settings.avatar_path',
+            ])
+            ->selectRaw('substring(logged_user_chats.text from 0 for 100) as last_message_thumb');
+
+        $result = $query->get();
+
+        if($result && $result->isNotEmpty())
+            return $result;
+
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $params
+     * @return Builder
+     */
+    protected function getAvailableChatsByUserQuery(int $userId, array $params): Builder
+    {
+        $take = $params['take'] ?? null;
+        $skip = $params['skip'] ?? null;
+
+        $query = DB::table('chats')
+            ->join('chat_user', function(Builder $query) use ($userId) {
+
+                $query->on('chats.id', '=', 'chat_user.chat_id')
+                    ->where('chat_user.user_id', '=', $userId)
+                    ->whereRaw('chat_user.is_visible is true');
+            })
+            ->select([
+                'chat_id'
+            ])
+            ->selectRaw("count(\"chats\".\"id\") over() as total_chats")
+            ->orderBy('chats.updated_at', 'desc');
+
+        if($take)
+            $query->take($take);
+
+        if($skip)
+            $query->skip($skip);
+
+        return $query;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $params
+     * @return Builder
+     */
+    protected function getChatsByFilteredMessages(int $userId, array $params): Builder
+    {
+        $filter = $params['filter'];
+        $take = $params['take'] ?? null;
+        $skip = $params['skip'] ?? null;
+
+        $query = DB::table('chat_user')
+            ->join('messages', function(Builder $query) use ($userId, $filter) {
+
+                $query->on('messages.chat_id', '=', 'chat_user.chat_id')
+                    ->where('chat_user.user_id', '=', $userId)
+                    ->whereRaw("messages.ts_text @@ plainto_tsquery('{$filter}')");
+            })
+            ->select([
+                'chat_user.chat_id as chat_id',
+                'messages.id as message_id',
+                'messages.text as text',
+            ])
+            ->selectRaw("count(\"chat_user\".\"chat_id\") over() as total_chats")
+            ->orderBy('messages.created_at', 'desc');
+
+        if($take)
+            $query->take($take);
+
+        if($skip)
+            $query->skip($skip);
+
+        return $query;
     }
 
     /**

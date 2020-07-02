@@ -45,4 +45,11 @@ interface MessageRepositoryContract
      * @return bool|null
      */
     public function delete(int $messageId): ?bool;
+
+    /**
+     * @param int $chatId
+     * @param int $messageId
+     * @return \stdClass|null
+     */
+    public function selectRowNumberByTotalMessages(int $chatId, int $messageId): ?\stdClass;
 }

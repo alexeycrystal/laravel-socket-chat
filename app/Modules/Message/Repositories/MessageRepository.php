@@ -114,4 +114,36 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryC
 
         return null;
     }
+
+    /**
+     * @param int $chatId
+     * @param int $messageId
+     * @return \stdClass|null
+     */
+    public function selectRowNumberByTotalMessages(int $chatId, int $messageId): ?\stdClass
+    {
+        $subQuery = DB::table('messages')
+            ->select([
+                'id'
+            ])
+            ->selectRaw("row_number() over() as row_number")
+            ->selectRaw("count(id) over() as total_count")
+            ->where('chat_id', '=', $chatId)
+            ->orderBy('created_at', 'asc');
+
+        $query = DB::query()
+            ->fromSub($subQuery, 'result')
+            ->select([
+                'row_number',
+                'total_count',
+            ])
+            ->where('id', '=', $messageId);
+
+        $result = $query->first();
+
+        if($result)
+            return $result;
+
+        return null;
+    }
 }

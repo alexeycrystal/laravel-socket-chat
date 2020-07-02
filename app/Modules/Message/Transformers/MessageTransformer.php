@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Route;
  */
 class MessageTransformer extends AbstractTransformer
 {
-    public static function transformMessagesIndex(array $payload, ?Collection $messages = null)
+    public static function transformMessagesIndex(array $payload,
+                                                  ?array $messages = null)
     {
         $result = [];
 
@@ -23,7 +24,13 @@ class MessageTransformer extends AbstractTransformer
 
         $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
 
+        $page = $payload['page'] ?? 1;
+
         if($messages) {
+
+            $payload = $messages['payload'];
+
+            $messages = $messages['result'];
 
             $firstEntry = $messages->first();
 
@@ -50,9 +57,13 @@ class MessageTransformer extends AbstractTransformer
             'total_messages' => $totalMessages,
         ];
 
+        $page = $payload && isset($payload['page'])
+            ? $payload['page']
+            : null;
+
         $links = self::preparePaginatedMeta(
             $currentRouteName,
-            $payload['page'],
+            $page,
             $totalMessages,
             $payload['per_page'],
         );

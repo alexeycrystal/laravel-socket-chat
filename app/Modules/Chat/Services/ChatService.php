@@ -10,6 +10,7 @@ use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\Chat\Models\Chat;
 use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
+use App\Modules\Message\Repositories\MessageRepositoryContract;
 use App\Modules\User\Repositories\UserCacheRepositoryContract;
 use App\Modules\User\Services\UserContactsServiceContract;
 use Illuminate\Support\Arr;
@@ -38,7 +39,12 @@ class ChatService extends AbstractService implements ChatServiceContract
      */
     protected UserContactsServiceContract $userContactsService;
 
+    /**
+     * @var UserCacheRepositoryContract
+     */
     protected UserCacheRepositoryContract $userCacheRepository;
+
+    protected MessageRepositoryContract $messageRepository;
 
     /**
      * ChatService constructor.
@@ -47,39 +53,49 @@ class ChatService extends AbstractService implements ChatServiceContract
      * @param ChatUserRepositoryContract $chatUserRepository
      * @param UserContactsServiceContract $userContactsService
      * @param UserCacheRepositoryContract $userCacheRepository
+     * @param MessageRepositoryContract $messageRepository
      */
     public function __construct(AuthServiceContract $authService,
                                 ChatRepositoryContract $chatRepository,
                                 ChatUserRepositoryContract $chatUserRepository,
                                 UserContactsServiceContract $userContactsService,
-                                UserCacheRepositoryContract $userCacheRepository)
+                                UserCacheRepositoryContract $userCacheRepository,
+                                MessageRepositoryContract $messageRepository)
     {
         $this->authService = $authService;
         $this->chatRepository = $chatRepository;
         $this->chatUserRepository = $chatUserRepository;
         $this->userContactsService = $userContactsService;
         $this->userCacheRepository = $userCacheRepository;
+        $this->messageRepository = $messageRepository;
     }
 
     /**
-     * @param array $params
+     * @param array $payload
      * @return array|null
      */
-    public function getChats(array $params): ?array
+    public function getChats(array $payload): ?array
     {
         $user = $this->authService->getLoggedUser();
 
         $params = [
-            'take' => $params['per_page'],
-            'skip' => $params['page'] > 1
-                ? $params['per_page'] * $params['page']
+            'take' => $payload['per_page'],
+            'skip' => $payload['page'] > 1
+                ? $payload['per_page'] * $payload['page']
                 : 0,
         ];
 
-        $result = $this->chatUserRepository
-            ->getAvailableChatsByUser($user->id, $params);
+        if (isset($payload['filter']))
+            $params['filter'] = $payload['filter'];
 
-        if($result) {
+        if (!isset($params['filter']))
+            $result = $this->chatUserRepository
+                ->getAvailableChatsByUser($user->id, $params);
+        else
+            $result = $this->chatUserRepository
+                ->getAvailableChatsByFilter($user->id, $params);
+
+        if ($result) {
 
             $userIds = $result->pluck('user_id')
                 ->values()
@@ -92,6 +108,7 @@ class ChatService extends AbstractService implements ChatServiceContract
                 'result' => $result,
                 'statuses' => $statuses,
                 'users_ids' => $userIds,
+                'is_filterable' => isset($params['filter'])
             ];
         }
 
@@ -110,7 +127,7 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         $existedChatId = $this->isChatAlreadyAssigned($loggedUserId, $usersIds);
 
-        if($existedChatId) {
+        if ($existedChatId) {
 
             $chatId = $existedChatId;
         } else {
@@ -122,7 +139,7 @@ class ChatService extends AbstractService implements ChatServiceContract
                 : null;
         }
 
-        if(!$chatId) {
+        if (!$chatId) {
 
             $this->addError(
                 504,
@@ -153,7 +170,7 @@ class ChatService extends AbstractService implements ChatServiceContract
         $existedChat = $this->chatUserRepository
             ->isAlreadyExists($loggedUserId, $validationUsersIds);
 
-        if($existedChat)
+        if ($existedChat)
             return $existedChat->chat_id;
 
         return null;
@@ -166,7 +183,7 @@ class ChatService extends AbstractService implements ChatServiceContract
      */
     public function createChat(int $userOwnerId, array $usersIds): ?Chat
     {
-        $chat = RepositoryManager::resolveTransactional(function() use ($userOwnerId, $usersIds) {
+        $chat = RepositoryManager::resolveTransactional(function () use ($userOwnerId, $usersIds) {
 
             $isConference = count($usersIds) > 2;
 
@@ -178,7 +195,7 @@ class ChatService extends AbstractService implements ChatServiceContract
             $chatCreated = $this->chatRepository
                 ->create($chatPayload);
 
-            if(!$chatCreated)
+            if (!$chatCreated)
                 return null;
 
             $chatUsersPayload = [];
@@ -186,7 +203,7 @@ class ChatService extends AbstractService implements ChatServiceContract
             $chatUsersIds = $usersIds;
             $chatUsersIds[] = $userOwnerId;
 
-            foreach($chatUsersIds as $chatUserId)
+            foreach ($chatUsersIds as $chatUserId)
                 $chatUsersPayload[] = [
                     'chat_id' => $chatCreated->id,
                     'user_id' => $chatUserId,
@@ -195,14 +212,14 @@ class ChatService extends AbstractService implements ChatServiceContract
             $usersAssignedToChat = $this->chatUserRepository
                 ->bulkInsert($chatUsersPayload);
 
-            if(!$usersAssignedToChat)
+            if (!$usersAssignedToChat)
                 return null;
 
             return $chatCreated;
 
         }, true);
 
-        if($chat)
+        if ($chat)
             return $chat;
 
         return null;
@@ -219,7 +236,7 @@ class ChatService extends AbstractService implements ChatServiceContract
         $result = $this->chatUserRepository
             ->update($user->id, $chatId, ['is_visible' => false]);
 
-        if(isset($result))
+        if (isset($result))
             return $result;
 
         $this->addError(
@@ -241,7 +258,7 @@ class ChatService extends AbstractService implements ChatServiceContract
         $result = $this->chatUserRepository
             ->isUserExistsByChat($userId, $chatId);
 
-        if(isset($result))
+        if (isset($result))
             return $result;
 
         $this->addError(
@@ -262,7 +279,7 @@ class ChatService extends AbstractService implements ChatServiceContract
         $result = $this->chatUserRepository
             ->isUserHasAccessToChats($userId, $chatIDs);
 
-        if(isset($result))
+        if (isset($result))
             return $result;
 
         $this->addError(

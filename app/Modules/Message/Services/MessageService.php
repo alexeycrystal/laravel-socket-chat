@@ -60,12 +60,35 @@ class MessageService extends AbstractService implements MessageServiceContract
      * @param array $params
      * @return Collection|null
      */
-    public function getMessagesByChat(int $chatId, array $params): ?Collection
+    public function getMessagesByChat(int $chatId, array $params): ?array
     {
+        $perPage = $params['per_page'];
+
+        if(isset($params['message_id'])) {
+
+            $messageId = $params['message_id'];
+
+            $result = $this->messageRepository
+                ->selectRowNumberByTotalMessages($chatId, $messageId);
+
+            if($result) {
+
+                $page = $this->computePageNumberByParts(
+                    $result->row_number,
+                    $result->total_count,
+                    $perPage
+                );
+
+                $params['page'] = $page;
+            }
+        } else {
+            $page = $params['page'];
+        }
+
         $payload = [
-            'take' => $params['per_page'],
-            'skip' => $params['page'] > 1
-                ? $params['per_page'] * ($params['page'] - 1)
+            'take' => $perPage,
+            'skip' => $page > 1
+                ? $perPage * ($page)
                 : 0,
         ];
 
@@ -73,9 +96,48 @@ class MessageService extends AbstractService implements MessageServiceContract
             ->getMessages($chatId, $payload);
 
         if($result)
-            return $result;
+            return [
+                'result' => $result,
+                'payload' => $params
+            ];
 
         return null;
+    }
+
+    /**
+     * Get page number for specific message
+     *
+     * @param int $rowNumber
+     * @param int $totalMessagesCount
+     * @param int $perPage
+     * @return int
+     */
+    protected function computePageNumberByParts(int $rowNumber,
+                                                int $totalMessagesCount,
+                                                int $perPage): int
+    {
+        $parts = null;
+
+        if($totalMessagesCount > $perPage) {
+            $parts = ceil($totalMessagesCount / $perPage);
+        } else if ($totalMessagesCount) {
+            $parts = 1;
+        }
+
+        $result = 0;
+
+        for($i = 1; $i <= $parts; ++$i) {
+
+            $biggerPart = $i * $perPage;
+            $smallerPart = $biggerPart - $perPage;
+
+            if($rowNumber > $smallerPart && $rowNumber <= $biggerPart) {
+                $result = $parts + ($i - 1);
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**

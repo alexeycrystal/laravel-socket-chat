@@ -43,6 +43,13 @@ interface ChatUserRepositoryContract
 
     /**
      * @param int $userId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getAvailableChatsByFilter(int $userId, array $params): ?Collection;
+
+    /**
+     * @param int $userId
      * @param int $chatId
      * @return bool|null
      */

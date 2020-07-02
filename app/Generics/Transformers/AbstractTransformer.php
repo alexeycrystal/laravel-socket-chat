@@ -16,6 +16,7 @@ abstract class AbstractTransformer
         $firstPage = null;
         $lastPage = null;
         $previousPage = null;
+        $currentPage = null;
         $nextPage = null;
 
         $totalPages = 0;
@@ -26,7 +27,7 @@ abstract class AbstractTransformer
                 ? ceil($totalCount / $perPage)
                 : 1;
 
-            $baseRootAlias = config('app.url') . $routeUrl . "?per_page={$perPage}&page=";
+            $baseRootAlias = $routeUrl . "?per_page={$perPage}&page=";
 
             $firstPage = $baseRootAlias . 1;
 
@@ -35,6 +36,8 @@ abstract class AbstractTransformer
             $previousPage = $totalPages > 1 && $page > 1
                 ? $baseRootAlias . ($page - 1)
                 : null;
+
+            $currentPage = $baseRootAlias . $page;
 
             $nextPage = $totalPages > $page
                 ? $baseRootAlias . ($page + 1)
@@ -45,6 +48,7 @@ abstract class AbstractTransformer
             'first_page' => $firstPage,
             'last_page' => $lastPage,
             'prev_page' => $previousPage,
+            'page' => $currentPage,
             'next_page' => $nextPage,
             'per_page' => $perPage,
             'total_pages' => $totalPages,

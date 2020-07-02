@@ -17,9 +17,9 @@ interface MessageServiceContract extends AbstractServiceContract
     /**
      * @param int $chatId
      * @param array $params
-     * @return Collection|null
+     * @return array|null
      */
-    public function getMessagesByChat(int $chatId, array $params): ?Collection;
+    public function getMessagesByChat(int $chatId, array $params): ?array;
 
     /**
      * @param array $payload

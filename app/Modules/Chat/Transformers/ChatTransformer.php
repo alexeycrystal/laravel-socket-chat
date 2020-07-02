@@ -85,6 +85,9 @@ class ChatTransformer extends AbstractTransformer
                     'status' => $status,
                 ];
 
+                if(isset($firstRow->message_id))
+                    $entry['message_id'] = $firstRow->message_id;
+
                 $result[] = $entry;
             }
         }

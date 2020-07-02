@@ -21,9 +21,14 @@ class IndexMessagesRequest extends JsonRequest
                 new UserChatPermissionValidationRule($authService, $chatService),
             ],
             'page' => [
-                'required',
+                'required_without:message_id',
                 'integer',
                 "min:1",
+            ],
+            'message_id' => [
+                'required_without:page',
+                'integer',
+                'exists:messages,id',
             ],
             'per_page' => [
                 'required',
