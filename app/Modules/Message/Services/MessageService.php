@@ -88,7 +88,7 @@ class MessageService extends AbstractService implements MessageServiceContract
         $payload = [
             'take' => $perPage,
             'skip' => $page > 1
-                ? $perPage * ($page)
+                ? $perPage * ($page - 1)
                 : 0,
         ];
 
@@ -131,8 +131,9 @@ class MessageService extends AbstractService implements MessageServiceContract
             $biggerPart = $i * $perPage;
             $smallerPart = $biggerPart - $perPage;
 
-            if($rowNumber > $smallerPart && $rowNumber <= $biggerPart) {
-                $result = $parts + ($i - 1);
+            if($rowNumber > $smallerPart
+                && $rowNumber <= $biggerPart) {
+                $result = $i;
                 break;
             }
         }

@@ -126,10 +126,10 @@ class MessageRepository extends AbstractRepository implements MessageRepositoryC
             ->select([
                 'id'
             ])
-            ->selectRaw("row_number() over() as row_number")
+            ->selectRaw("row_number() over(order by created_at desc) as row_number")
             ->selectRaw("count(id) over() as total_count")
             ->where('chat_id', '=', $chatId)
-            ->orderBy('created_at', 'asc');
+            ->orderBy('created_at', 'desc');
 
         $query = DB::query()
             ->fromSub($subQuery, 'result')
