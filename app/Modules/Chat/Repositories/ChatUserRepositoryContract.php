@@ -4,7 +4,6 @@
 namespace App\Modules\Chat\Repositories;
 
 
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 
 /**
@@ -75,4 +74,17 @@ interface ChatUserRepositoryContract
      * @return Collection|null
      */
     public function getAllUsersByChats(array $chatIds, ?array $exceptUserIds = null): ?Collection;
+
+    /**
+     * @param int $chatId
+     * @param array $userIds
+     * @return bool|null
+     */
+    public function setChatVisibleForUsers(int $chatId, array $userIds): ?bool;
+
+    /**
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function isChatNotInitializedForUsers(int $chatId): ?bool;
 }

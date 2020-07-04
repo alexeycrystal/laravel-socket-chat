@@ -44,7 +44,7 @@ class UserCacheRepository extends AbstractRepository implements UserCacheReposit
         $keys = [];
 
         foreach($userIds as $userId)
-            $keys[] = $path = $this->rootPath . ':' . $userId . ':status';
+            $keys[] = $this->rootPath . ':' . $userId . ':status';
 
         $result = Redis::mget($keys);
 

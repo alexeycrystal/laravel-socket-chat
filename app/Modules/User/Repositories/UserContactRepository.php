@@ -33,6 +33,7 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
             })
             ->join('user_settings as settings', 'settings.user_id', '=', 'user.id')
             ->select([
+                'user.id as user_id',
                 'contact.id as contact_id',
                 'user.name as contact_name',
                 'settings.avatar_path as avatar'
@@ -72,7 +73,7 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
                     });
             })
             ->select([
-                'user.id as contact_id',
+                'user.id as user_id',
                 'user.name as contact_name',
                 'settings.avatar_path as avatar'
             ])

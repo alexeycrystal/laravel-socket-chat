@@ -37,7 +37,7 @@ class UserContactTransformer extends AbstractTransformer
             foreach($data as $contact) {
 
                 $result[] = [
-                    'user_id' => $contact->contact_id,
+                    'user_id' => $contact->contact_id ?? $contact->user_id,
                     'name' => $contact->contact_name,
                     'avatar' => $first->avatar
                         ? config('app.url') . $first->avatar

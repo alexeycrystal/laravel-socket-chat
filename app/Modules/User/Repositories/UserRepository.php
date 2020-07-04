@@ -6,6 +6,7 @@ namespace App\Modules\User\Repositories;
 
 use App\GenericModels\User;
 use App\Generics\Repositories\AbstractRepository;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -75,6 +76,29 @@ class UserRepository extends AbstractRepository implements UserRepositoryContrac
 
         if($result)
             return $result === count($userIds);
+
+        return null;
+    }
+
+    public function getUserMetaInfo(int $userId): ?\stdClass
+    {
+        $query = DB::table('users as user')
+            ->join('user_settings as settings', function(Builder $query) use ($userId) {
+
+                $query->on('user.id', '=', 'settings.user_id')
+                    ->where('user.id', '=', $userId);
+            })
+            ->select([
+                'user.id as user_id',
+                'user.name as name',
+                'settings.nickname as nickname',
+                'settings.avatar_path as avatar',
+            ]);
+
+        $result = $query->first();
+
+        if($result)
+            return $result;
 
         return null;
     }

@@ -119,9 +119,27 @@ class ChatTransformer extends AbstractTransformer
      */
     public static function transformChatCreated(array $data): array
     {
+        $chat = $data['user_meta_info'];
+
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+
+        $status = $data['status'][0] ?? '';
+
+        $entry = [
+            'chat_id' => $data['chat_id'],
+            'user_id' => $chat->user_id,
+            'title' => $chat->name,
+            'last_message' => '',
+            'avatar' => isset($chat->avatar)
+                ? config('app.url') . $chat->avatar
+                : $defaultAvatarUrl,
+            'status' => $status,
+        ];
+
         return [
             'data' => [
-                'chat_id' => $data['chat_id']
+                'chat_id' => $data['chat_id'],
+                'chat' => $entry
             ]
         ];
     }

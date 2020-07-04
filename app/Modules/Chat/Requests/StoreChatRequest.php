@@ -15,6 +15,7 @@ class StoreChatRequest extends JsonRequest
                 'required',
                 'array',
                 'min:1',
+                'max:1',
             ],
             "users_ids.*"  => [
                 'required',

@@ -12,9 +12,8 @@ use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
 use App\Modules\Message\Repositories\MessageRepositoryContract;
 use App\Modules\User\Repositories\UserCacheRepositoryContract;
+use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Services\UserContactsServiceContract;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 /**
  * Class ChatService
@@ -38,13 +37,19 @@ class ChatService extends AbstractService implements ChatServiceContract
      * @var UserContactsServiceContract
      */
     protected UserContactsServiceContract $userContactsService;
-
     /**
      * @var UserCacheRepositoryContract
      */
     protected UserCacheRepositoryContract $userCacheRepository;
-
+    /**
+     * @var MessageRepositoryContract
+     */
     protected MessageRepositoryContract $messageRepository;
+
+    /**
+     * @var UserRepositoryContract
+     */
+    protected UserRepositoryContract $userRepository;
 
     /**
      * ChatService constructor.
@@ -54,13 +59,15 @@ class ChatService extends AbstractService implements ChatServiceContract
      * @param UserContactsServiceContract $userContactsService
      * @param UserCacheRepositoryContract $userCacheRepository
      * @param MessageRepositoryContract $messageRepository
+     * @param UserRepositoryContract $userRepository
      */
     public function __construct(AuthServiceContract $authService,
                                 ChatRepositoryContract $chatRepository,
                                 ChatUserRepositoryContract $chatUserRepository,
                                 UserContactsServiceContract $userContactsService,
                                 UserCacheRepositoryContract $userCacheRepository,
-                                MessageRepositoryContract $messageRepository)
+                                MessageRepositoryContract $messageRepository,
+                                UserRepositoryContract $userRepository)
     {
         $this->authService = $authService;
         $this->chatRepository = $chatRepository;
@@ -68,6 +75,7 @@ class ChatService extends AbstractService implements ChatServiceContract
         $this->userContactsService = $userContactsService;
         $this->userCacheRepository = $userCacheRepository;
         $this->messageRepository = $messageRepository;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -149,8 +157,11 @@ class ChatService extends AbstractService implements ChatServiceContract
             return null;
         }
 
+        $userMeta = $this->getChatUserMetaInfo($usersIds[0]);
+
         return [
             'chat_id' => $chatId,
+            'user_meta_info' => $userMeta,
             'chat_already_exists' => isset($existedChatId),
         ];
     }
@@ -203,11 +214,16 @@ class ChatService extends AbstractService implements ChatServiceContract
             $chatUsersIds = $usersIds;
             $chatUsersIds[] = $userOwnerId;
 
-            foreach ($chatUsersIds as $chatUserId)
+            foreach ($chatUsersIds as $chatUserId) {
+
+                $status = $chatUserId  === $userOwnerId;
+
                 $chatUsersPayload[] = [
                     'chat_id' => $chatCreated->id,
                     'user_id' => $chatUserId,
+                    'is_visible' => $status,
                 ];
+            }
 
             $usersAssignedToChat = $this->chatUserRepository
                 ->bulkInsert($chatUsersPayload);
@@ -287,6 +303,28 @@ class ChatService extends AbstractService implements ChatServiceContract
             'ChatService@isUserHasAccessToChats',
             'Some serious error occurs during the chat user validation process.'
         );
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @return \stdClass|null
+     */
+    public function getChatUserMetaInfo(int $userId): ?\stdClass
+    {
+        $result = $this->userRepository
+            ->getUserMetaInfo($userId);
+
+        if($result) {
+
+            $status = $this->userCacheRepository
+                ->getStatusesByUserIds([$userId]);
+
+            $result->status = $status;
+
+            return $result;
+        }
+
         return null;
     }
 }

@@ -168,6 +168,8 @@ class MessageService extends AbstractService implements MessageServiceContract
             $userIdsByChat = $this->chatUserRepository
                 ->getUserIdsByChat($chatId, [$user->id]);
 
+            $this->initChatByFirstMessageForUsers($chatId, $userIdsByChat);
+
             broadcast(
                 new ChatMessageSentEvent(
                     'chat.user',
@@ -185,6 +187,28 @@ class MessageService extends AbstractService implements MessageServiceContract
             'Some serious error occurs during the message creation process.'
         );
         return null;
+    }
+
+    /**
+     * @param int $chatId
+     * @param array $usersIds
+     * @return bool|null
+     */
+    protected function initChatByFirstMessageForUsers(int $chatId, array $usersIds): ?bool
+    {
+        $isChatNotInitialized = $this->chatUserRepository
+            ->isChatNotInitializedForUsers($chatId);
+
+        if($isChatNotInitialized)
+            return true;
+
+        $result = $this->chatUserRepository
+            ->setChatVisibleForUsers($chatId, $usersIds);
+
+        if($result)
+            return true;
+
+        return false;
     }
 
     /**

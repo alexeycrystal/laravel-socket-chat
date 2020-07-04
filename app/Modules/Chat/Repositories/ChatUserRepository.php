@@ -329,4 +329,39 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
 
         return null;
     }
+
+    /**
+     * @param int $chatId
+     * @param array $userIds
+     * @return bool|null
+     */
+    public function setChatVisibleForUsers(int $chatId, array $userIds): ?bool
+    {
+        $result = DB::table('chat_user')
+            ->where('chat_id', '=', $chatId)
+            ->whereIn('user_id', $userIds)
+            ->update(['is_visible' => true]);
+
+        if(isset($result))
+            return $result;
+
+        return null;
+    }
+
+    /**
+     * @param int $chatId
+     * @return bool|null
+     */
+    public function isChatNotInitializedForUsers(int $chatId): ?bool
+    {
+        $result = DB::table('chat_user')
+            ->where('chat_id', '=', $chatId)
+            ->whereRaw('is_visible IS TRUE')
+            ->count();
+
+        if($result > 1)
+            return true;
+
+        return false;
+    }
 }

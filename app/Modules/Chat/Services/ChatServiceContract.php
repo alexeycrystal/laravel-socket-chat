@@ -59,4 +59,10 @@ interface ChatServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function isUserHasAccessToChats(int $userId, array $chatIDs): ?bool;
+
+    /**
+     * @param int $userId
+     * @return \stdClass|null
+     */
+    public function getChatUserMetaInfo(int $userId): ?\stdClass;
 }

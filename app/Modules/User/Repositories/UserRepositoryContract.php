@@ -36,4 +36,10 @@ interface UserRepositoryContract
      * @return bool|null
      */
     public function isUsersListExisted(array $userIds): ?bool;
+
+    /**
+     * @param int $userId
+     * @return \stdClass|null
+     */
+    public function getUserMetaInfo(int $userId): ?\stdClass;
 }
