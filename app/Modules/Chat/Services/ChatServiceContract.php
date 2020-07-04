@@ -7,6 +7,7 @@ namespace App\Modules\Chat\Services;
 use App\Generics\Services\AbstractServiceContract;
 use App\Modules\Chat\Models\Chat;
 use Illuminate\Support\Collection;
+use stdClass;
 
 /**
  * Interface ChatServiceContract
@@ -14,6 +15,12 @@ use Illuminate\Support\Collection;
  */
 interface ChatServiceContract extends AbstractServiceContract
 {
+    /**
+     * @param int $chatId
+     * @return stdClass|null
+     */
+    public function showChat(int $chatId): ?stdClass;
+
     /**
      * @param array $params
      * @return array|null

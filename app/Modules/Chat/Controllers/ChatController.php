@@ -7,6 +7,7 @@ namespace App\Modules\Chat\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Chat\Requests\DestroyChatRequest;
 use App\Modules\Chat\Requests\IndexChatRequest;
+use App\Modules\Chat\Requests\ShowChatRequest;
 use App\Modules\Chat\Requests\StoreChatRequest;
 use App\Modules\Chat\Services\ChatServiceContract;
 use App\Modules\Chat\Transformers\ChatTransformer;
@@ -41,6 +42,23 @@ class ChatController extends Controller
 
         return response()->json(
             ChatTransformer::transformChatIndex($payload, $result), 200
+        );
+    }
+
+    public function show(ShowChatRequest $request, $id)
+    {
+        $payload = $request->validated();
+
+        $result = $this->chatService
+            ->showChat($payload['id']);
+
+        if($this->chatService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs when receiving the list of user chats!'
+            ], 400);
+
+        return response()->json(
+            ChatTransformer::transformShowChat($result), 200
         );
     }
 

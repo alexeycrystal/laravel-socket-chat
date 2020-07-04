@@ -15,6 +15,13 @@ interface ChatUserRepositoryContract
     /**
      * @param int $userId
      * @param int $chatId
+     * @return \stdClass|null
+     */
+    public function getChatMetaInfo(int $userId, int $chatId): ?\stdClass;
+
+    /**
+     * @param int $userId
+     * @param int $chatId
      * @param array $payload
      * @return bool|null
      */

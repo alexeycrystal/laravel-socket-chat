@@ -14,6 +14,7 @@ use App\Modules\Message\Repositories\MessageRepositoryContract;
 use App\Modules\User\Repositories\UserCacheRepositoryContract;
 use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Services\UserContactsServiceContract;
+use stdClass;
 
 /**
  * Class ChatService
@@ -76,6 +77,33 @@ class ChatService extends AbstractService implements ChatServiceContract
         $this->userCacheRepository = $userCacheRepository;
         $this->messageRepository = $messageRepository;
         $this->userRepository = $userRepository;
+    }
+
+    /**
+     * @param int $chatId
+     * @return stdClass|null
+     */
+    public function showChat(int $chatId): ?\stdClass
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $userId = $user->id;
+
+        $result = $this->chatUserRepository
+            ->getChatMetaInfo($userId, $chatId);
+
+        if($result) {
+
+            $statuses = $this->userCacheRepository
+                ->getStatusesByUserIds([$userId]);
+
+            if($statuses && !empty($statuses))
+                $result->status = $statuses[0];
+
+            return $result;
+        }
+
+        return null;
     }
 
     /**

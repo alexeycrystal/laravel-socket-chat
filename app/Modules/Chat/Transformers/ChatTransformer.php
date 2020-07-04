@@ -156,4 +156,30 @@ class ChatTransformer extends AbstractTransformer
             ]
         ];
     }
+
+    public static function transformShowChat(\stdClass $data): array
+    {
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+
+        $status = $data->status && $data->status !== 'offline'
+            ? $data->status
+            : '';
+
+        $entry = [
+            'chat_id' => $data->chat_id,
+            'user_id' => $data->user_id,
+            'title' => $data->name,
+            'last_message' => $data->last_message_thumb,
+            'avatar' => isset($chat->avatar)
+                ? config('app.url') . $chat->avatar
+                : $defaultAvatarUrl,
+            'status' => $status,
+        ];
+
+        return [
+            'data' => [
+                'chat' => $entry
+            ]
+        ];
+    }
 }
