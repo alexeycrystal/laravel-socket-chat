@@ -21,6 +21,11 @@ class IndexUserContactsRequest extends JsonRequest
                 'integer',
                 'min:1',
             ],
+            'filter' => [
+                'sometimes',
+                'string',
+                'min:1',
+            ],
         ];
     }
 }

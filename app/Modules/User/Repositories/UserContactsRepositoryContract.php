@@ -21,6 +21,13 @@ interface UserContactsRepositoryContract
 
     /**
      * @param int $userId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getContactsByFilter(int $userId, array $params): ?Collection;
+
+    /**
+     * @param int $userId
      * @param array $contactUsersIds
      * @return bool|null
      */

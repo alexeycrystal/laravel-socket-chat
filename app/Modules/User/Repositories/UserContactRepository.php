@@ -31,11 +31,52 @@ class UserContactRepository extends AbstractRepository implements UserContactsRe
                 $query->on('user.id', '=', 'contact.user_id')
                     ->where('contact.user_id', '=', $userId);
             })
+            ->join('user_settings as settings', 'settings.user_id', '=', 'user.id')
             ->select([
                 'contact.id as contact_id',
                 'user.name as contact_name',
+                'settings.avatar_path as avatar'
             ])
             ->selectRaw('count("contact"."contact_user_id") over() as total_contacts')
+            ->take($take)
+            ->skip($skip)
+            ->orderBy('contact_name');
+
+        $result = $query->get();
+
+        if($result && $result->isNotEmpty())
+            return $result;
+
+        return null;
+    }
+
+    /**
+     * @param int $userId
+     * @param array $params
+     * @return Collection|null
+     */
+    public function getContactsByFilter(int $userId, array $params): ?Collection
+    {
+        $filter = $this->sqlEscapeLikeRaw($params['filter']);
+        $take = $params['take'];
+        $skip = $params['skip'];
+
+        $query = DB::table('users as user')
+            ->join('user_settings as settings', function(Builder $query) use ($filter) {
+
+                $query->on('settings.user_id', '=', 'user.id')
+                    ->where(function(Builder $query) use ($filter) {
+
+                        $query->whereRaw("\"user\".\"name\" LIKE '%{$filter}%'")
+                            ->orWhereRaw("\"settings\".\"nickname\" LIKE '%{$filter}%'");
+                    });
+            })
+            ->select([
+                'user.id as contact_id',
+                'user.name as contact_name',
+                'settings.avatar_path as avatar'
+            ])
+            ->selectRaw('count("user"."id") over() as total_contacts')
             ->take($take)
             ->skip($skip)
             ->orderBy('contact_name');

@@ -26,6 +26,8 @@ class UserContactTransformer extends AbstractTransformer
 
         $totalContactsCount = 0;
 
+        $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
+
         if($data) {
 
             $first = $data->first();
@@ -37,6 +39,9 @@ class UserContactTransformer extends AbstractTransformer
                 $result[] = [
                     'user_id' => $contact->contact_id,
                     'name' => $contact->contact_name,
+                    'avatar' => $first->avatar
+                        ? config('app.url') . $first->avatar
+                        : $defaultAvatarUrl
                 ];
             }
         }

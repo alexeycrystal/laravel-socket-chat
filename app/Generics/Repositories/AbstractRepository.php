@@ -81,4 +81,17 @@ abstract class AbstractRepository
         }
         return $sql;
     }
+
+    public static function sqlEscapeLikeRaw(string $str)
+    {
+        $ret = str_replace(
+            ['%', '_'],
+            ['\%', '\_'],
+            DB::getPdo()->quote($str)
+        );
+
+        return $ret && strlen($ret) >= 2
+            ? substr($ret, 1, strlen($ret) - 2)
+            : $ret;
+    }
 }

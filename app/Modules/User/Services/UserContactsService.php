@@ -51,8 +51,21 @@ class UserContactsService extends AbstractService implements UserContactsService
                 : 0,
         ];
 
-        $result = $this->userContactsRepository
-            ->getContactsByParams($user->id, $payload);
+        $filtered = false;
+        if(isset($params['filter'])) {
+            $payload['filter'] = $params['filter'];
+            $filtered = true;
+        }
+
+        $userId = $user->id;
+
+        if(!$filtered) {
+            $result = $this->userContactsRepository
+                ->getContactsByParams($userId, $payload);
+        } else {
+            $result = $this->userContactsRepository
+                ->getContactsByFilter($userId, $payload);
+        }
 
         if($result)
             return $result;

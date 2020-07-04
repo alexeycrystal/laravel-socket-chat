@@ -21,6 +21,8 @@ class CreateUsersModuleTables extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+
+            $table->index(['name']);
         });
 
         Schema::create('user_settings', function (Blueprint $table) {
@@ -51,6 +53,7 @@ class CreateUsersModuleTables extends Migration
             $table->timestamps();
 
             $table->index(['user_id']);
+            $table->index(['nickname']);
         });
 
         Schema::create('user_contacts', function (Blueprint $table) {
