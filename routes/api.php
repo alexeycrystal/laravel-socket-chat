@@ -38,6 +38,8 @@ Route::group([
 
     Route::group(['middleware' => ['jwt.validate']], function() {
 
+        Route::post('photo', 'UserProfileController@saveProfilePhoto');
+
         Route::get('settings/get', 'UserProfileController@getProfileByLoggedUser');
 
         Route::post('settings/update', 'UserProfileController@updateProfileSettings');

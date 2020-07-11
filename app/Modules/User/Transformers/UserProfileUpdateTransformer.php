@@ -14,4 +14,14 @@ class UserProfileUpdateTransformer
             ]
         ];
     }
+
+    public static function transformPhotoSave(string $photoPath): array
+    {
+        return [
+            'data' => [
+                'result' => isset($photoPath),
+                'path' => config('app.url') . $photoPath
+            ]
+        ];
+    }
 }

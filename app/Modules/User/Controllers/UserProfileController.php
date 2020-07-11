@@ -8,6 +8,7 @@ use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\Controller;
 use App\Modules\User\Requests\ChangePasswordRequest;
 use App\Modules\User\Requests\GetProfileByLoggedUserRequest;
+use App\Modules\User\Requests\SaveProfilePhotoRequest;
 use App\Modules\User\Requests\Status\UpdateUserStatusRequest;
 use App\Modules\User\Requests\UserProfileUpdateRequest;
 use App\Modules\User\Services\UserProfileServiceContract;
@@ -86,6 +87,24 @@ class UserProfileController extends Controller
         if($result)
             return response()->json(
                 UserProfileUpdateTransformer::transform($result), 202
+            );
+
+        if(!$result || $this->userProfileService->hasErrors())
+            return response()->json([
+                'error' => 'Error occurs during the status change process.'
+            ], 400);
+    }
+
+    public function saveProfilePhoto(SaveProfilePhotoRequest $request)
+    {
+        $payload = $request->validated();
+
+        $result = $this->userProfileService
+            ->storeProfilePhoto($payload['photo']);
+
+        if($result)
+            return response()->json(
+                UserProfileUpdateTransformer::transformPhotoSave($result), 201
             );
 
         if(!$result || $this->userProfileService->hasErrors())

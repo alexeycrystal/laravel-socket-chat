@@ -42,4 +42,10 @@ interface UserProfileServiceContract extends AbstractServiceContract
      * @return bool|null
      */
     public function changeLoggedUserStatus(string $status): ?bool;
+
+    /**
+     * @param $photo
+     * @return string|null
+     */
+    public function storeProfilePhoto($photo): ?string;
 }

@@ -14,6 +14,7 @@ use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
 use App\Traits\Broadcast\PostProcessingBroadcaster;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use stdClass;
 
 /**
@@ -41,6 +42,9 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
      */
     protected UserCacheRepositoryContract $userCacheRepository;
 
+    /**
+     * @var UserRealtimeDependencyRepositoryContract
+     */
     protected UserRealtimeDependencyRepositoryContract $userRealtimeDependencyRepository;
 
     /**
@@ -203,5 +207,38 @@ class UserProfileService extends AbstractService implements UserProfileServiceCo
         }
 
         return false;
+    }
+
+    /**
+     * @param $photo
+     * @return string|null
+     */
+    public function storeProfilePhoto($photo): ?string
+    {
+        $user = $this->authService->getLoggedUser();
+
+        $userId = $user->id;
+
+        $extension = $photo->extension();
+
+        $savedPath = Storage::putFileAs("public/avatars/" . $userId, $photo, 'avatar.' . $extension);
+
+        if($savedPath) {
+
+            $newPath = "/storage/avatars/{$userId}/avatar.{$extension}";
+
+            $result = $this->userSettingsRepository
+                ->update($userId, ['avatar_path' => $newPath]);
+
+            if($result)
+                return $newPath;
+        }
+
+        $this->addError(
+            504,
+            'UserProfileService@storeProfilePhoto',
+            'Some temporary error happened in the file storage on server.'
+        );
+        return null;
     }
 }

@@ -18,7 +18,9 @@ class UserProfileTransformer
                 'timezone' => $userSettings->timezone,
                 'phone' => $userSettings->phone ?? '',
                 'lang' => $userSettings->lang,
-                'avatar' => $userSettings->avatar_path ?? $defaultAvatarUrl,
+                'avatar' => $userSettings->avatar_path
+                    ? config('app.url') . $userSettings->avatar_path
+                    : $defaultAvatarUrl,
             ],
         ];
     }
