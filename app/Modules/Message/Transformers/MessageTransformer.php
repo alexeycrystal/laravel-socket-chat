@@ -95,7 +95,9 @@ class MessageTransformer extends AbstractTransformer
                     'user_id' => $message->user_id,
                     'text' => $message->text,
                     'created_at' => $message->created_at,
-                    'avatar' => $message->avatar ?? $defaultAvatarUrl,
+                    'avatar' => $message->avatar
+                        ? config('app.url') . $message->avatar
+                        : $defaultAvatarUrl,
                 ],
             ]
         ];
