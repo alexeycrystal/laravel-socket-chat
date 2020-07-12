@@ -4,12 +4,17 @@
 namespace App\Generics\Transformers;
 
 
+use App\Entities\Response\Login\LoginResponseEntity;
+use App\Entities\Response\Login\LoginResultEntity;
+
 class BaseDataResponseTransformer
 {
-    public static function transform(array $data): array
+    public static function transform(LoginResultEntity $data): LoginResponseEntity
     {
-        return [
-            'data' => $data
-        ];
+        $entity = new LoginResponseEntity();
+
+        $entity->data = $data;
+
+        return $entity;
     }
 }

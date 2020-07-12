@@ -4,6 +4,9 @@
 namespace App\Modules\Auth\Services;
 
 
+use App\Entities\Request\LoginEntity;
+use App\Entities\Response\Login\LoginResultEntity;
+use App\Entities\Response\LoginResponseEntity;
 use App\Facades\RepositoryManager;
 use App\GenericModels\User;
 use App\Generics\Services\AbstractService;
@@ -11,7 +14,6 @@ use App\Modules\User\Repositories\UserRepositoryContract;
 use App\Modules\User\Repositories\UserSettingsRepositoryContract;
 use App\Services\IP\LocationIPServiceContract;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
@@ -60,14 +62,15 @@ class AuthService extends AbstractService implements AuthServiceContract
     }
 
     /**
-     * @param array $credentials
-     * @return array|null
+     * @param LoginEntity $credentials
+     * @return LoginResultEntity|null
+     * @throws \Exception
      */
-    public function login(array $credentials): ?array
+    public function login(LoginEntity $credentials): ?LoginResultEntity
     {
         $credentials = [
-            'email' => $credentials['email'],
-            'password' => $credentials['password'],
+            'email' => $credentials->email,
+            'password' => $credentials->password,
         ];
 
         $token = $this->jwtService
@@ -85,10 +88,10 @@ class AuthService extends AbstractService implements AuthServiceContract
 
         $user = JWTAuth::user();
 
-        return [
+        return new LoginResultEntity([
             'user_id' => $user->id,
             'token' => $token,
-        ];
+        ]);
     }
 
     /**
