@@ -4,12 +4,14 @@
 namespace App\Generics\Transformers;
 
 
+use App\Modules\Chat\Entities\ChatLinksEntity;
+
 abstract class AbstractTransformer
 {
     public static function preparePaginatedMeta(string $apiRouteName,
                                                    int $page,
                                                    int $totalCount,
-                                                   int $perPage): array
+                                                   int $perPage): ChatLinksEntity
     {
         $routeUrl = route($apiRouteName);
 
@@ -44,7 +46,7 @@ abstract class AbstractTransformer
                 : null;
         }
 
-        return [
+        return new ChatLinksEntity([
             'first_page' => $firstPage,
             'last_page' => $lastPage,
             'prev_page' => $previousPage,
@@ -52,6 +54,6 @@ abstract class AbstractTransformer
             'next_page' => $nextPage,
             'per_page' => $perPage,
             'total_pages' => $totalPages,
-        ];
+        ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\APIController;
 use App\Modules\Auth\Requests\RegistrationRequest;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Auth\Transformers\RegistrationTransformer;
 use Illuminate\Http\JsonResponse;
 
 class RegistrationController extends APIController
@@ -62,7 +63,7 @@ class RegistrationController extends APIController
 
         if($result)
             return response()->json(
-                BaseDataResponseTransformer::transform($result), 201
+                RegistrationTransformer::transform($result), 201
             );
 
         if(!$result || $this->authService->hasErrors())

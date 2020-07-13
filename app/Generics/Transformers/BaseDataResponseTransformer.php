@@ -4,17 +4,12 @@
 namespace App\Generics\Transformers;
 
 
-use App\Entities\Response\Registration\RegistrationResponseEntity;
-use App\Entities\Response\Registration\RegistrationResultEntity;
-
 class BaseDataResponseTransformer
 {
-    public static function transform(RegistrationResultEntity $data): RegistrationResponseEntity
+    public static function transform(array $data): array
     {
-        $entity = new RegistrationResponseEntity();
-
-        $entity->data = $data;
-
-        return $entity;
+        return [
+            'data' => $data
+        ];
     }
 }

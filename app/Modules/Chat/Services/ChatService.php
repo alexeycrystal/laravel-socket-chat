@@ -7,6 +7,8 @@ namespace App\Modules\Chat\Services;
 use App\Facades\RepositoryManager;
 use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Chat\Entities\ChatIndexResultEntity;
+use App\Modules\Chat\Entities\ChatIndexEntity;
 use App\Modules\Chat\Models\Chat;
 use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
@@ -107,22 +109,23 @@ class ChatService extends AbstractService implements ChatServiceContract
     }
 
     /**
-     * @param array $payload
+     * @param ChatIndexEntity $payload
      * @return array|null
+     * @throws \Exception
      */
-    public function getChats(array $payload): ?array
+    public function getChats(ChatIndexEntity $payload): ?ChatIndexResultEntity
     {
         $user = $this->authService->getLoggedUser();
 
         $params = [
-            'take' => $payload['per_page'],
-            'skip' => $payload['page'] > 1
-                ? $payload['per_page'] * $payload['page']
+            'take' => $payload->per_page,
+            'skip' => $payload->page > 1
+                ? $payload->per_page * $payload->page
                 : 0,
         ];
 
-        if (isset($payload['filter']))
-            $params['filter'] = $payload['filter'];
+        if (isset($payload->filter))
+            $params['filter'] = $payload->filter;
 
         if (!isset($params['filter']))
             $result = $this->chatUserRepository
@@ -140,12 +143,12 @@ class ChatService extends AbstractService implements ChatServiceContract
             $statuses = $this->userCacheRepository
                 ->getStatusesByUserIds($userIds);
 
-            return [
+            return new ChatIndexResultEntity([
                 'result' => $result,
                 'statuses' => $statuses,
                 'users_ids' => $userIds,
                 'is_filterable' => isset($params['filter'])
-            ];
+            ]);
         }
 
         return null;

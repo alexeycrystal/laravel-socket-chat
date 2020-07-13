@@ -4,6 +4,7 @@
 namespace App\Http\Middleware\Auth;
 
 
+use App\Generics\Entities\UnauthorizedResponseEntity;
 use Closure;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -25,9 +26,10 @@ class JWTTokenCheck extends BaseMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $this->checkForToken($request);
 
         try {
+
+            $this->checkForToken($request);
 
             $token = $this->auth->parseToken();
 
@@ -40,11 +42,24 @@ class JWTTokenCheck extends BaseMiddleware
 
             $refreshedToken  = $token->refresh();
 
+        } catch(UnauthorizedHttpException $e) {
+
+            $status = 401;
+
+            return response()
+                ->json(new UnauthorizedResponseEntity([
+                    'message' => 'You are not authorized for this action.',
+                    'status_code' => $status
+                ]), $status);
         } catch(JWTException $e) {
 
-            throw new UnauthorizedHttpException(
-                'jwt-auth', $e->getMessage(), $e, $e->getCode()
-            );
+            $status = 401;
+
+            return response()
+                ->json(new UnauthorizedResponseEntity([
+                    'message' => 'You are not authorized for this action.',
+                    'status_code' => $status
+                ]), $status);
         }
 
         $response = $next($request);

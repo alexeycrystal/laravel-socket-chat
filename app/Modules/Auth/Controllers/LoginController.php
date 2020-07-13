@@ -9,6 +9,7 @@ use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\APIController;
 use App\Modules\Auth\Requests\LoginRequest;
 use App\Modules\Auth\Services\AuthServiceContract;
+use App\Modules\Auth\Transformers\LoginTransformer;
 use Illuminate\Http\JsonResponse;
 
 class LoginController extends APIController
@@ -61,7 +62,7 @@ class LoginController extends APIController
 
         if ($result) {
 
-            $transformed = BaseDataResponseTransformer::transform($result);
+            $transformed = LoginTransformer::transform($result);
 
             return response()->json(
                 $transformed , 200

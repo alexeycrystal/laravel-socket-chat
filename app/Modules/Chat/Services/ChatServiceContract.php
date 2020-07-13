@@ -5,8 +5,9 @@ namespace App\Modules\Chat\Services;
 
 
 use App\Generics\Services\AbstractServiceContract;
+use App\Modules\Chat\Entities\ChatIndexResultEntity;
+use App\Modules\Chat\Entities\ChatIndexEntity;
 use App\Modules\Chat\Models\Chat;
-use Illuminate\Support\Collection;
 use stdClass;
 
 /**
@@ -22,10 +23,10 @@ interface ChatServiceContract extends AbstractServiceContract
     public function showChat(int $chatId): ?stdClass;
 
     /**
-     * @param array $params
-     * @return array|null
+     * @param ChatIndexEntity $params
+     * @return ChatIndexResultEntity|null
      */
-    public function getChats(array $params): ?array;
+    public function getChats(ChatIndexEntity $params): ?ChatIndexResultEntity;
 
     /**
      * @param array $usersIds

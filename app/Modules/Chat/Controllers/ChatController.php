@@ -4,7 +4,8 @@
 namespace App\Modules\Chat\Controllers;
 
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\APIController;
+use App\Modules\Chat\Entities\ChatIndexEntity;
 use App\Modules\Chat\Requests\DestroyChatRequest;
 use App\Modules\Chat\Requests\IndexChatRequest;
 use App\Modules\Chat\Requests\ShowChatRequest;
@@ -13,7 +14,15 @@ use App\Modules\Chat\Services\ChatServiceContract;
 use App\Modules\Chat\Transformers\ChatTransformer;
 use Illuminate\Http\JsonResponse;
 
-class ChatController extends Controller
+/**
+ * @OA\SecurityScheme(
+ *      securityScheme="bearerAuth",
+ *      type="http",
+ *      scheme="bearer",
+ *      bearerFormat="JWT"
+ * )
+ */
+class ChatController extends APIController
 {
     protected ChatServiceContract $chatService;
 
@@ -23,19 +32,88 @@ class ChatController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/user/chats",
+     *     operationId="chatIndex",
+     *     tags={"Chat"},
+     *     summary="User authentication endpoint to receive auth token.",
+     *     security = {{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Elements per page limiter",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int32",
+     *             minimum=1,
+     *             example=10
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number to select",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int32",
+     *             minimum=1,
+     *             example=10
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="filter",
+     *         in="query",
+     *         description="Filter value to search chats by messages",
+     *         required=false,
+     *         example=10,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="my message"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Received chats with no errors.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/ChatIndexResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Unauthorized error. Invalid token or bearer token not presented.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/UnauthorizedResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Validation error. Invalid parameters."
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Some serious issue (with database / store) / server.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/SeriousServerErrorResponseEntity"
+     *         )
+     *     )
+     * )
      *
      * @param IndexChatRequest $request
      * @return JsonResponse
+     * @throws \Exception
      */
     public function index(IndexChatRequest $request)
     {
         $payload = $request->validated();
 
+        $payload = new ChatIndexEntity($payload);
+
         $result = $this->chatService
             ->getChats($payload);
 
-        if($this->chatService->hasErrors())
+        if ($this->chatService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs when receiving the list of user chats!'
             ], 400);
@@ -52,7 +130,7 @@ class ChatController extends Controller
         $result = $this->chatService
             ->showChat($payload['id']);
 
-        if($this->chatService->hasErrors())
+        if ($this->chatService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs when receiving the list of user chats!'
             ], 400);
@@ -75,7 +153,7 @@ class ChatController extends Controller
         $result = $this->chatService
             ->createChatIfNotExists($payload['users_ids']);
 
-        if($result) {
+        if ($result) {
 
             $responseCode = $result['chat_already_exists']
                 ? 200
@@ -86,7 +164,7 @@ class ChatController extends Controller
             );
         }
 
-        if(!$result || $this->chatService->hasErrors())
+        if (!$result || $this->chatService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs during the chat creation process!'
             ], 400);
@@ -104,12 +182,12 @@ class ChatController extends Controller
         $result = $this->chatService
             ->hideChatAndClearHistory($id);
 
-        if($result)
+        if ($result)
             return response()->json(
                 ChatTransformer::chatDeleteSuccess($result), 204
             );
 
-        if(!$result || $this->chatService->hasErrors())
+        if (!$result || $this->chatService->hasErrors())
             return response()->json([
                 'error' => 'Error occurs when receiving the list of user chats!'
             ], 400);

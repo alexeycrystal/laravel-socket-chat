@@ -5,6 +5,11 @@ namespace App\Modules\Chat\Transformers;
 
 
 use App\Generics\Transformers\AbstractTransformer;
+use App\Modules\Chat\Entities\ChatIndexEntryEntity;
+use App\Modules\Chat\Entities\ChatIndexResponseEntity;
+use App\Modules\Chat\Entities\ChatIndexResultEntity;
+use App\Modules\Chat\Entities\ChatIndexEntity;
+use App\Modules\Chat\Entities\ChatLinksMetaEntity;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -14,12 +19,13 @@ use Illuminate\Support\Facades\Route;
 class ChatTransformer extends AbstractTransformer
 {
     /**
-     * @param array $payload
-     * @param array|null $data
-     * @return array
+     * @param ChatIndexEntity $payload
+     * @param ChatIndexResultEntity|null $data
+     * @return ChatIndexResponseEntity
+     * @throws \Exception
      */
-    public static function transformChatIndex(array $payload,
-                                              ?array $data = null): array
+    public static function transformChatIndex(ChatIndexEntity $payload,
+                                              ?ChatIndexResultEntity $data = null): ChatIndexResponseEntity
     {
         $result = [];
 
@@ -30,14 +36,14 @@ class ChatTransformer extends AbstractTransformer
 
         if($data) {
 
-            $statuses = $data['statuses'];
-            $usersIds = $data['users_ids'];
+            $statuses = $data->statuses;
+            $usersIds = $data->users_ids;
 
             $statusResult = [];
             foreach($usersIds as $index => $userId)
                 $statusResult[$userId] = $statuses[$index] ?? '';
 
-            $data = $data['result'];
+            $data = $data->result;
 
             $totalChatCount = $data->first()->total_chats;
 
@@ -76,14 +82,14 @@ class ChatTransformer extends AbstractTransformer
                     $userId = $firstRow->user_id;
                 }
 
-                $entry = [
+                $entry = new ChatIndexEntryEntity([
                     'chat_id' => $firstRow->chat_id,
                     'user_id' => $userId,
                     'title' => $chatTitle,
                     'last_message' => $firstRow->last_message_thumb,
                     'avatar' => $avatar,
                     'status' => $status,
-                ];
+                ]);
 
                 if(isset($firstRow->message_id))
                     $entry['message_id'] = $firstRow->message_id;
@@ -94,23 +100,23 @@ class ChatTransformer extends AbstractTransformer
 
         $currentRouteName = Route::currentRouteName();
 
-        $meta = [
+        $meta = new ChatLinksMetaEntity([
             'total_chats' => $totalChatCount,
-        ];
+        ]);
 
         $links = self::preparePaginatedMeta(
             $currentRouteName,
-            $payload['page'],
+            $payload->page,
             $totalChatCount,
-            $payload['per_page'],
+            $payload->per_page,
         );
 
-        $links['meta'] = $meta;
+        $links->meta = $meta;
 
-        return [
+        return new ChatIndexResponseEntity([
             'data' => $result,
             'links' => $links
-        ];
+        ]);
     }
 
     /**
