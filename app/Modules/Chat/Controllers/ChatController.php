@@ -194,7 +194,7 @@ class ChatController extends APIController
      *     path="/user/chats/{chat_id}",
      *     operationId="chatShow",
      *     tags={"Chat"},
-     *     summary="Get chat by id.",
+     *     summary="Store new chat or return if existed.",
      *     security = {{"bearerAuth": {}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
@@ -217,7 +217,7 @@ class ChatController extends APIController
      *         response="200",
      *         description="Received chats with no errors.",
      *         @OA\JsonContent(
-     *              ref="#/components/schemas/ChatShowResponseEntity"
+     *              ref="#/components/schemas/ChatStoreResponseEntity"
      *         )
      *     ),
      *     @OA\Response(
