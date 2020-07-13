@@ -5,6 +5,7 @@ namespace App\Modules\Chat\Transformers;
 
 
 use App\Generics\Transformers\AbstractTransformer;
+use App\Modules\Chat\Entities\Delete\ChatDeleteResponseEntity;
 use App\Modules\Chat\Entities\Index\ChatIndexEntryEntity;
 use App\Modules\Chat\Entities\Index\ChatIndexResponseEntity;
 use App\Modules\Chat\Entities\Index\ChatIndexResultEntity;
@@ -161,15 +162,15 @@ class ChatTransformer extends AbstractTransformer
 
     /**
      * @param bool $result
-     * @return array|\bool[][]
+     * @return ChatDeleteResponseEntity
      */
-    public static function chatDeleteSuccess(bool $result): array
+    public static function chatDeleteSuccess(bool $result): ChatDeleteResponseEntity
     {
-        return [
+        return new ChatDeleteResponseEntity([
             'data' => [
                 'result' => $result,
-            ]
-        ];
+            ],
+        ]);
     }
 
     public static function transformShowChat(ChatShowResultEntity $data): ChatShowResponseEntity

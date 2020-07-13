@@ -192,7 +192,7 @@ class ChatController extends APIController
     /**
      * @OA\Post(
      *     path="/user/chats/{chat_id}",
-     *     operationId="chatShow",
+     *     operationId="chatStore",
      *     tags={"Chat"},
      *     summary="Store new chat or return if existed.",
      *     security = {{"bearerAuth": {}}},
@@ -214,8 +214,15 @@ class ChatController extends APIController
      *         )
      *     ),
      *     @OA\Response(
+     *         response="201",
+     *         description="Received created chat.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/ChatStoreResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
      *         response="200",
-     *         description="Received chats with no errors.",
+     *         description="Received already existed chat.",
      *         @OA\JsonContent(
      *              ref="#/components/schemas/ChatStoreResponseEntity"
      *         )
@@ -269,10 +276,52 @@ class ChatController extends APIController
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/user/chats/{chat_id}",
+     *     operationId="chatDestroy",
+     *     tags={"Chat"},
+     *     summary="Delete chat by id.",
+     *     security = {{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="chat_id",
+     *         in="path",
+     *         description="Chat id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64",
+     *             minimum=1,
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="204",
+     *         description="Chat deletion success.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/ChatDeleteResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Unauthorized error. Invalid token or bearer token not presented.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/UnauthorizedResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Validation error. Invalid parameters."
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Some serious issue (with database / store) / server.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/SeriousServerErrorResponseEntity"
+     *         )
+     *     )
+     * )
      *
      * @param DestroyChatRequest $request
-     * @param int $id
+     * @param $id
      * @return JsonResponse
      */
     public function destroy(DestroyChatRequest $request, $id)
