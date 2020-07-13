@@ -46,12 +46,12 @@ class ChatUserRepository extends AbstractRepository implements ChatUserRepositor
                 'chat_user.chat_id as chat_id',
 
                 'user.id as user_id',
-                'user.name as name',
-                'settings.avatar_path',
+                'user.name as title',
+                'settings.avatar_path as avatar',
 
                 'messages.id as message_id',
             ])
-            ->selectRaw('substring(messages.text from 0 for 100) as last_message_thumb');
+            ->selectRaw('substring(messages.text from 0 for 100) as last_message');
 
         $result = $query->first();
 

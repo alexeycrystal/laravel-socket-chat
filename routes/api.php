@@ -80,10 +80,3 @@ Route::group([
         ->middleware(['navigator.beacon', 'jwt.validate']);
 });
 
-Route::group([
-    'prefix' => 'proxy',
-    'namespace' => 'App\Modules\BeaconProxy\Controllers'
-], function() {
-
-    Route::post('beacon', 'BeaconProxyController@processRequest');
-});

@@ -7,6 +7,8 @@ namespace App\Modules\Chat\Services;
 use App\Generics\Services\AbstractServiceContract;
 use App\Modules\Chat\Entities\Index\ChatIndexResultEntity;
 use App\Modules\Chat\Entities\Index\ChatIndexEntity;
+use App\Modules\Chat\Entities\Show\ChatShowResultEntity;
+use App\Modules\Chat\Entities\Store\ChatStoreResultEntity;
 use App\Modules\Chat\Models\Chat;
 use stdClass;
 
@@ -18,9 +20,9 @@ interface ChatServiceContract extends AbstractServiceContract
 {
     /**
      * @param int $chatId
-     * @return stdClass|null
+     * @return ChatShowResultEntity|null
      */
-    public function showChat(int $chatId): ?stdClass;
+    public function showChat(int $chatId): ?ChatShowResultEntity;
 
     /**
      * @param ChatIndexEntity $params
@@ -30,9 +32,9 @@ interface ChatServiceContract extends AbstractServiceContract
 
     /**
      * @param array $usersIds
-     * @return array|null
+     * @return ChatStoreResultEntity|null
      */
-    public function createChatIfNotExists(array $usersIds): ?array;
+    public function createChatIfNotExists(array $usersIds): ?ChatStoreResultEntity;
 
     /**
      * @param int $loggedUserId

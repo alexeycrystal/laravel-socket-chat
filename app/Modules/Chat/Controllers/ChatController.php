@@ -36,7 +36,7 @@ class ChatController extends APIController
      *     path="/user/chats",
      *     operationId="chatIndex",
      *     tags={"Chat"},
-     *     summary="User authentication endpoint to receive auth token.",
+     *     summary="Endpoint to receive chat list by parameters.",
      *     security = {{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="per_page",
@@ -123,6 +123,55 @@ class ChatController extends APIController
         );
     }
 
+    /**
+     * @OA\Get(
+     *     path="/user/chats/{chat_id}",
+     *     operationId="chatShow",
+     *     tags={"Chat"},
+     *     summary="Get chat by id.",
+     *     security = {{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="chat_id",
+     *         in="path",
+     *         description="Chat id",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int64",
+     *             minimum=1,
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Received chats with no errors.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/ChatShowResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Unauthorized error. Invalid token or bearer token not presented.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/UnauthorizedResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Validation error. Invalid parameters."
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Some serious issue (with database / store) / server.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/SeriousServerErrorResponseEntity"
+     *         )
+     *     )
+     * )
+     *
+     * @param ShowChatRequest $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function show(ShowChatRequest $request, $id)
     {
         $payload = $request->validated();
@@ -141,8 +190,55 @@ class ChatController extends APIController
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
+     * @OA\Post(
+     *     path="/user/chats/{chat_id}",
+     *     operationId="chatShow",
+     *     tags={"Chat"},
+     *     summary="Get chat by id.",
+     *     security = {{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="users_ids",
+     *                     description="User ids to add to the chat",
+     *                     type="array",
+     *                     @OA\Items(
+     *                          type="integer",
+     *                          minimum=1
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Received chats with no errors.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/ChatShowResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Unauthorized error. Invalid token or bearer token not presented.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/UnauthorizedResponseEntity"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Validation error. Invalid parameters."
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Some serious issue (with database / store) / server.",
+     *         @OA\JsonContent(
+     *              ref="#/components/schemas/SeriousServerErrorResponseEntity"
+     *         )
+     *     )
+     * )
      * @param StoreChatRequest $request
      * @return JsonResponse
      */
@@ -155,12 +251,17 @@ class ChatController extends APIController
 
         if ($result) {
 
-            $responseCode = $result['chat_already_exists']
+            $responseCode = $result->chat_already_exists
                 ? 200
                 : 201;
 
+            $transformed = ChatTransformer::transformChatCreated($result);
+
+            echo json_encode($transformed);
+            die();
+
             return response()->json(
-                ChatTransformer::transformChatCreated($result), $responseCode
+                $transformed, $responseCode
             );
         }
 

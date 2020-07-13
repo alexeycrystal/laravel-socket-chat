@@ -15,18 +15,15 @@ class AbstractEntity
     /**
      * AbstractEntity constructor.
      * @param array $data generated from eloquent->toArray()
-     * @throws \Exception
      */
-    public function __construct(?array $data = null)
+    public function __construct($data = null)
     {
         if($data) {
 
             foreach ($data as $nameProperty => $valueProperty){
 
-                if (!property_exists($this, $nameProperty))
-                    throw new \Exception('Mapper FROM array to Entities (Called in Repository): Property  << '.$nameProperty. ' >> does not exist in '.get_class($this));
-
-                $this->$nameProperty = $valueProperty;
+                if (property_exists($this, $nameProperty))
+                    $this->$nameProperty = $valueProperty;
             }
         }
     }

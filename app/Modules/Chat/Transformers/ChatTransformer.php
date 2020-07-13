@@ -11,6 +11,12 @@ use App\Modules\Chat\Entities\Index\ChatIndexResultEntity;
 use App\Modules\Chat\Entities\Index\ChatIndexEntity;
 use App\Modules\Chat\Entities\Index\ChatLinksEntity;
 use App\Modules\Chat\Entities\Index\ChatLinksMetaEntity;
+use App\Modules\Chat\Entities\Show\ChatShowEntity;
+use App\Modules\Chat\Entities\Show\ChatShowResponseEntity;
+use App\Modules\Chat\Entities\Show\ChatShowResultEntity;
+use App\Modules\Chat\Entities\Store\ChatStoreEntity;
+use App\Modules\Chat\Entities\Store\ChatStoreResponseEntity;
+use App\Modules\Chat\Entities\Store\ChatStoreResultEntity;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -121,19 +127,19 @@ class ChatTransformer extends AbstractTransformer
     }
 
     /**
-     * @param array $data
-     * @return array|array[]
+     * @param ChatStoreResultEntity $data
+     * @return ChatStoreResponseEntity
      */
-    public static function transformChatCreated(array $data): array
+    public static function transformChatCreated(ChatStoreResultEntity $data): ChatStoreResponseEntity
     {
-        $chat = $data['user_meta_info'];
+        $chat = $data->user_meta_info;
 
         $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
 
-        $status = $data['status'][0] ?? '';
+        $status = $data->status ?? '';
 
-        $entry = [
-            'chat_id' => $data['chat_id'],
+        $entry = new ChatShowResultEntity([
+            'chat_id' => $data->chat_id,
             'user_id' => $chat->user_id,
             'title' => $chat->name,
             'last_message' => '',
@@ -141,14 +147,16 @@ class ChatTransformer extends AbstractTransformer
                 ? config('app.url') . $chat->avatar
                 : $defaultAvatarUrl,
             'status' => $status,
-        ];
+        ]);
 
-        return [
-            'data' => [
-                'chat_id' => $data['chat_id'],
-                'chat' => $entry
-            ]
-        ];
+        $storeEntity = new ChatStoreEntity([
+            'chat_id' => $data->chat_id,
+            'chat' => $entry,
+        ]);
+
+        return new ChatStoreResponseEntity([
+            'data' => $storeEntity,
+        ]);
     }
 
     /**
@@ -164,29 +172,24 @@ class ChatTransformer extends AbstractTransformer
         ];
     }
 
-    public static function transformShowChat(\stdClass $data): array
+    public static function transformShowChat(ChatShowResultEntity $data): ChatShowResponseEntity
     {
         $defaultAvatarUrl = config('app.url') . '/storage/avatars/default/default_avatar.png';
 
-        $status = $data->status && $data->status !== 'offline'
+        $data->status = $data->status && $data->status !== 'offline'
             ? $data->status
             : '';
 
-        $entry = [
-            'chat_id' => $data->chat_id,
-            'user_id' => $data->user_id,
-            'title' => $data->name,
-            'last_message' => $data->last_message_thumb,
-            'avatar' => isset($chat->avatar)
-                ? config('app.url') . $chat->avatar
-                : $defaultAvatarUrl,
-            'status' => $status,
-        ];
+        $data->avatar = isset($data->avatar)
+            ? config('app.url') . $data->avatar
+            : $defaultAvatarUrl;
 
-        return [
-            'data' => [
-                'chat' => $entry
-            ]
-        ];
+        $chatShow = new ChatShowEntity();
+        $chatShow->chat = $data;
+
+        $result = new ChatShowResponseEntity();
+        $result->data = $chatShow;
+
+        return $result;
     }
 }

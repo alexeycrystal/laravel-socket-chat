@@ -9,6 +9,8 @@ use App\Generics\Services\AbstractService;
 use App\Modules\Auth\Services\AuthServiceContract;
 use App\Modules\Chat\Entities\Index\ChatIndexResultEntity;
 use App\Modules\Chat\Entities\Index\ChatIndexEntity;
+use App\Modules\Chat\Entities\Show\ChatShowResultEntity;
+use App\Modules\Chat\Entities\Store\ChatStoreResultEntity;
 use App\Modules\Chat\Models\Chat;
 use App\Modules\Chat\Repositories\ChatRepositoryContract;
 use App\Modules\Chat\Repositories\ChatUserRepositoryContract;
@@ -83,9 +85,10 @@ class ChatService extends AbstractService implements ChatServiceContract
 
     /**
      * @param int $chatId
-     * @return stdClass|null
+     * @return ChatShowResultEntity|null
+     * @throws \Exception
      */
-    public function showChat(int $chatId): ?\stdClass
+    public function showChat(int $chatId): ?ChatShowResultEntity
     {
         $user = $this->authService->getLoggedUser();
 
@@ -102,7 +105,7 @@ class ChatService extends AbstractService implements ChatServiceContract
             if($statuses && !empty($statuses))
                 $result->status = $statuses[0];
 
-            return $result;
+            return new ChatShowResultEntity($result);
         }
 
         return null;
@@ -156,9 +159,9 @@ class ChatService extends AbstractService implements ChatServiceContract
 
     /**
      * @param array $usersIds
-     * @return array|null
+     * @return ChatShowResultEntity|null
      */
-    public function createChatIfNotExists(array $usersIds): ?array
+    public function createChatIfNotExists(array $usersIds): ?ChatStoreResultEntity
     {
         $loggedUser = $this->authService->getLoggedUser();
 
@@ -190,11 +193,11 @@ class ChatService extends AbstractService implements ChatServiceContract
 
         $userMeta = $this->getChatUserMetaInfo($usersIds[0]);
 
-        return [
+        return new ChatStoreResultEntity([
             'chat_id' => $chatId,
             'user_meta_info' => $userMeta,
             'chat_already_exists' => isset($existedChatId),
-        ];
+        ]);
     }
 
     /**
