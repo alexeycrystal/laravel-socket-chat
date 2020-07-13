@@ -257,9 +257,6 @@ class ChatController extends APIController
 
             $transformed = ChatTransformer::transformChatCreated($result);
 
-            echo json_encode($transformed);
-            die();
-
             return response()->json(
                 $transformed, $responseCode
             );
