@@ -4,9 +4,10 @@
 namespace App\Modules\Auth\Services;
 
 
-use App\Entities\Request\LoginEntity;
+use App\Entities\Request\Login\LoginEntity;
+use App\Entities\Request\Registration\RegistrationEntity;
 use App\Entities\Response\Login\LoginResultEntity;
-use App\Entities\Response\LoginResponseEntity;
+use App\Entities\Response\Registration\RegistrationResultEntity;
 use App\GenericModels\User;
 use App\Generics\Services\AbstractServiceContract;
 
@@ -23,10 +24,10 @@ interface AuthServiceContract extends AbstractServiceContract
     public function login(LoginEntity $entity): ?LoginResultEntity;
 
     /**
-     * @param array $payload
-     * @return array|null
+     * @param RegistrationEntity $payload
+     * @return RegistrationResultEntity|null
      */
-    public function registration(array $payload): ?array;
+    public function registration(RegistrationEntity $payload): ?RegistrationResultEntity;
 
     /**
      * @return User|null

@@ -4,9 +4,10 @@
 namespace App\Modules\Auth\Services;
 
 
-use App\Entities\Request\LoginEntity;
+use App\Entities\Request\Login\LoginEntity;
+use App\Entities\Request\Registration\RegistrationEntity;
 use App\Entities\Response\Login\LoginResultEntity;
-use App\Entities\Response\LoginResponseEntity;
+use App\Entities\Response\Registration\RegistrationResultEntity;
 use App\Facades\RepositoryManager;
 use App\GenericModels\User;
 use App\Generics\Services\AbstractService;
@@ -95,15 +96,16 @@ class AuthService extends AbstractService implements AuthServiceContract
     }
 
     /**
-     * @param array $payload
-     * @return array|null
+     * @param RegistrationEntity $payload
+     * @return RegistrationResultEntity|null
+     * @throws \Exception
      */
-    public function registration(array $payload): ?array
+    public function registration(RegistrationEntity $payload): ?RegistrationResultEntity
     {
         $fields = [
-            'email' => $payload['email'],
-            'password' => Hash::make($payload['password']),
-            'name' => $payload['name'],
+            'email' => $payload->email,
+            'password' => Hash::make($payload->password),
+            'name' => $payload->name,
         ];
 
         $user = RepositoryManager::resolveTransactional(function() use ($fields, $payload) {
@@ -117,7 +119,7 @@ class AuthService extends AbstractService implements AuthServiceContract
 
                 $settingsPayload = [
                     'user_id' => $user->id,
-                    'lang' => $payload['lang'],
+                    'lang' => $payload->lang,
                 ];
 
                 $settingsData = $this->prepareUserSettingsPayload($settingsPayload);
@@ -157,10 +159,10 @@ class AuthService extends AbstractService implements AuthServiceContract
             return null;
         }
 
-        return [
+        return new RegistrationResultEntity([
             'user_id' => $user->id,
             'token' => $token,
-        ];
+        ]);
     }
 
     /**

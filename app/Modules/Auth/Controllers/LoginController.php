@@ -4,7 +4,7 @@
 namespace App\Modules\Auth\Controllers;
 
 
-use App\Entities\Request\LoginEntity;
+use App\Entities\Request\Login\LoginEntity;
 use App\Generics\Transformers\BaseDataResponseTransformer;
 use App\Http\Controllers\APIController;
 use App\Modules\Auth\Requests\LoginRequest;

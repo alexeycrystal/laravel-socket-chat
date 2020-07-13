@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Entities\Request;
+namespace App\Entities\Request\Login;
 
 use App\Generics\Entities\AbstractEntity;
 
