@@ -5,11 +5,12 @@ namespace App\Modules\Chat\Transformers;
 
 
 use App\Generics\Transformers\AbstractTransformer;
-use App\Modules\Chat\Entities\ChatIndexEntryEntity;
-use App\Modules\Chat\Entities\ChatIndexResponseEntity;
-use App\Modules\Chat\Entities\ChatIndexResultEntity;
-use App\Modules\Chat\Entities\ChatIndexEntity;
-use App\Modules\Chat\Entities\ChatLinksMetaEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexEntryEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexResponseEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexResultEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexEntity;
+use App\Modules\Chat\Entities\Index\ChatLinksEntity;
+use App\Modules\Chat\Entities\Index\ChatLinksMetaEntity;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -104,12 +105,12 @@ class ChatTransformer extends AbstractTransformer
             'total_chats' => $totalChatCount,
         ]);
 
-        $links = self::preparePaginatedMeta(
+        $links = new ChatLinksEntity(self::preparePaginatedMeta(
             $currentRouteName,
             $payload->page,
             $totalChatCount,
             $payload->per_page,
-        );
+        ));
 
         $links->meta = $meta;
 

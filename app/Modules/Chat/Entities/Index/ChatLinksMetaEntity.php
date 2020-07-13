@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Modules\Chat\Entities;
+namespace App\Modules\Chat\Entities\Index;
 
 
 use App\Generics\Entities\AbstractEntity;

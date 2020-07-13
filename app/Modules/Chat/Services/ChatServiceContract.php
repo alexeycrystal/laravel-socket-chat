@@ -5,8 +5,8 @@ namespace App\Modules\Chat\Services;
 
 
 use App\Generics\Services\AbstractServiceContract;
-use App\Modules\Chat\Entities\ChatIndexResultEntity;
-use App\Modules\Chat\Entities\ChatIndexEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexResultEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexEntity;
 use App\Modules\Chat\Models\Chat;
 use stdClass;
 

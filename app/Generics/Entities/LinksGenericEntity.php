@@ -4,7 +4,7 @@
 namespace App\Generics\Entities;
 
 
-abstract class LinksGenericEntity extends AbstractEntity
+class LinksGenericEntity extends AbstractEntity
 {
     /**
      * @OA\Property(

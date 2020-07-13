@@ -5,7 +5,7 @@ namespace App\Modules\Chat\Controllers;
 
 
 use App\Http\Controllers\APIController;
-use App\Modules\Chat\Entities\ChatIndexEntity;
+use App\Modules\Chat\Entities\Index\ChatIndexEntity;
 use App\Modules\Chat\Requests\DestroyChatRequest;
 use App\Modules\Chat\Requests\IndexChatRequest;
 use App\Modules\Chat\Requests\ShowChatRequest;
